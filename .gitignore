@@ -1,0 +1,23 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+*.log
+
+# Secrets — never commit real credentials
+.env
+.env.local
+*.pem
+*.key
+
+# WhatsApp / session state (when implementation starts)
+.whatsapp/
+sessions/
+*.session.json
+
+# Python / Node (for future prototype)
+__pycache__/
+.venv/
+node_modules/
+dist/
