@@ -77,13 +77,21 @@ Admin creates (what/who/when/action) → approval → scheduled send → log del
 - `correction {id, bad_msg_id, fix_text, audience, sent_at}`.
 - `image_job {msg_id, downloaded_at, deleted_at, privacy_flag}` — bytes transient, metadata only.
 
-## 5. Provider decision (validate in sandbox, Phase 0.5)
+## 5. Provider decision — free picks (validate in sandbox, Phase 0.5)
 
-| Option | Fit | Watch out |
+**What the sandbox is for:** a safe, isolated test setup — a Meta test number plus
+our own dev phones — where we prove the bot receives text/images, detects QAF
+invocation, stays silent otherwise, and replies in the right shape. All of this
+happens WITHOUT touching the real participant group. Only after the sandbox
+acceptance below passes do we point anything at a real number.
+
+| Option | Verdict | Why |
 |---|---|---|
-| WhatsApp Cloud API (direct) | Official, webhooks for text/image, template control | Group mention/reply detection varies; test quote-reply + caption parsing |
-| BSP (Twilio/360dialog/etc.) | Faster setup, tooling, number hosting | Cost, feature lag, same group limits |
-| Phone-automation (unofficial) | Full group view | Bannable, fragile, privacy risk — **rejected** |
+| Meta Cloud API test number (direct) | **Use — free, recommended** | Official, auto-generated in the Meta app dashboard; free test messages to up to 5 recipient phones; same API as production (no rework later); user-initiated service conversations are free and unlimited, which matches our bot exactly (participants invoke QAF first, we reply inside the 24h window) |
+| Cloudflare Tunnel (`cloudflared`) for local webhook | **Use — free, recommended** | Exposes local Next.js webhook to Meta for free; no code changes between tunnel and later hosting |
+| Twilio WhatsApp Sandbox | **Rejected** | Free to access but every message billed at $0.005 after the $15 trial credit; shared sandbox number with join-code opt-in; hard-capped at 1 msg / 3 sec; sessions expire and users must rejoin |
+| 360dialog / other BSPs | **Rejected for now** | Monthly channel fees (≈$49+/mo) add cost without benefit at pilot scale |
+| Phone-automation (unofficial) | **Rejected** | Bannable, fragile, privacy risk |
 
 Acceptance before build: receive text + image-with-caption, detect reply-to-QAF, send <400-char reply, stay silent on non-invoked traffic, handle burst of 20 duplicate questions as one answer.
 
