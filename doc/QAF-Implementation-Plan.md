@@ -6,7 +6,7 @@ Status: planning — no code yet. This plan turns PRD Stages 0–4 into manageab
 
 Design choice applied from prior review: **image/screenshot assistance (PRD F19, Sec 9.5) is treated as core from Phase 1**, not deferred to P1. All image rules below come from Context Sec 6.
 
-## Architecture (proposed, tech-neutral)
+## Architecture (see full design: `doc/QAF-Architecture.md`)
 
 ```
 WhatsApp group → Cloud API webhook → QAF service
@@ -24,6 +24,7 @@ Key constraints:
 - WhatsApp group bots cannot reliably read every reply/thread — validate invocation detection (mention, quote-reply, help phrase) against the chosen provider before pilot.
 - No vector search over raw chat history. Retrieval corpus = curated approved docs with version + effective date. Chat is signal for the review queue, not a source of truth.
 - Images: download on invocation only, run privacy gate first, retain no longer than necessary, never repost.
+- Conversation + admin UI rules: `doc/QAF-Design-System.md` (message templates normative for bot output).
 
 ## Phase 0 — Readiness (PRD Stage 0)
 
