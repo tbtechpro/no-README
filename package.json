@@ -11,6 +11,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "eval": "node scripts/eval.mjs",
+    "freshness": "node scripts/freshness.mjs",
+    "check": "node scripts/eval.mjs && node scripts/freshness.mjs",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio"

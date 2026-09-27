@@ -2,6 +2,7 @@ import { readFileSync, existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { redirect } from "next/navigation";
 import { earlyFinal } from "@/lib/qaf/reminders";
+import { computeMetrics } from "@/lib/qaf/metrics";
 
 // Admin console (local only, no login yet — auth arrives with real deployment).
 // Corpus browser + pause switch + ticket queue + patterns + deadline/reminders.
@@ -52,6 +53,24 @@ async function validateSpotlight(formData: FormData) {
   redirect("/admin");
 }
 
+type CorpusSeedItem = CorpusItem & { body: string; sourceLink: string | null; effectiveFrom: string; expiresAt: string | null; version: number };
+
+async function setCorpusStatus(formData: FormData) {
+  "use server";
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (!["approved", "draft", "retired"].includes(status)) redirect("/admin");
+  const file = dataFile("corpus.seed.json");
+  const all = JSON.parse(readFileSync(file, "utf8")) as CorpusSeedItem[];
+  const item = all.find((x) => x.id === id);
+  if (item) {
+    item.status = status;
+    item.version += 1;
+    writeFileSync(file, JSON.stringify(all, null, 2));
+  }
+  redirect("/admin");
+}
+
 export default function Admin() {
   const corpus = readJson<CorpusItem[]>("corpus.seed.json", []);
   const tickets = readJson<Ticket[]>("tickets.json", []);
@@ -63,6 +82,7 @@ export default function Admin() {
   const deadline = nextSundayDeadline();
   const { early, final } = earlyFinal(deadline);
   const fmt = (d: Date) => d.toUTCString();
+  const m = computeMetrics();
 
   return (
     <main style={{ maxWidth: 900, margin: "32px auto", padding: "0 24px", lineHeight: 1.5, fontFamily: "Segoe UI, system-ui, sans-serif" }}>
@@ -81,17 +101,39 @@ export default function Admin() {
       <h2>Corpus — {approved} approved / {corpus.length} total</h2>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead><tr style={{ textAlign: "left", borderBottom: "2px solid #0E6B6B" }}>
-          <th>ID</th><th>Title</th><th>Owner</th><th>Status</th>
+          <th>ID</th><th>Title</th><th>Owner</th><th>Status</th><th>Controls</th>
         </tr></thead>
         <tbody>
           {corpus.map((c) => (
             <tr key={c.id} style={{ borderBottom: "1px solid #E2E8E8" }}>
               <td>{c.id}</td><td>{c.title}</td><td>{c.owner}</td>
               <td style={{ color: c.status === "approved" ? "#1F7A3D" : "#8A5A00", fontWeight: 700 }}>{c.status}</td>
+              <td style={{ whiteSpace: "nowrap" }}>
+                {c.status !== "approved" && (
+                  <form action={setCorpusStatus} style={{ display: "inline", marginRight: 4 }}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <input type="hidden" name="status" value="approved" />
+                    <button type="submit" style={{ background: "#1F7A3D", color: "#fff", border: "none", borderRadius: 6, padding: "2px 10px", cursor: "pointer" }}>Approve</button>
+                  </form>
+                )}
+                {c.status === "approved" && (
+                  <form action={setCorpusStatus} style={{ display: "inline" }}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <input type="hidden" name="status" value="retired" />
+                    <button type="submit" style={{ background: "#fff", color: "#B3261E", border: "1.5px solid #B3261E", borderRadius: 6, padding: "2px 10px", cursor: "pointer" }}>Retire</button>
+                  </form>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <h2>Metrics — pilot baseline (local decision log)</h2>
+      <p>Answered: {m.invoked} · Silent (not invoked): {m.silent} · Handoffs: {m.handoffs} ({m.handoffRate}%) ·
+        Rate-limited: {m.rateLimited} · Post-check blocks: {m.postcheckFails} ·
+        Tickets: {m.tickets} ({m.openTickets} open).</p>
+      <p style={{ color: "#5F6B6B", fontSize: 12 }}>Traffic is synthetic (eval runs) until the sandbox goes live — then these become the real Sec-14 baseline.</p>
 
       <h2>Deadline + reminders</h2>
       <p>Weekly assessment due: <b>{fmt(deadline)}</b> (Sundays 23:59 WAT).<br />

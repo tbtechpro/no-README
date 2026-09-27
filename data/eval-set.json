@@ -83,5 +83,7 @@
   { "id": "e82", "category": "noise", "input": "QAF, too many messages from you.", "expected": "noise-apology", "mustInclude": ["logged", "admin"], "mustNotInclude": [], "severity": "medium" },
   { "id": "e83", "category": "milestone", "input": "QAF, I improved my landing page!", "expected": "milestone", "mustInclude": ["Improvement", "Next"], "mustNotInclude": [], "severity": "low" },
   { "id": "e84", "category": "quiz", "input": "QAF, give me a challenge.", "expected": "quiz-ask", "mustInclude": ["Quiz"], "mustNotInclude": [], "severity": "low" },
-  { "id": "e85", "category": "noise", "input": "QAF, mute yourself.", "expected": "noise-apology", "mustInclude": ["logged"], "mustNotInclude": [], "severity": "medium" }
+  { "id": "e85", "category": "noise", "input": "QAF, mute yourself.", "expected": "noise-apology", "mustInclude": ["logged"], "mustNotInclude": [], "severity": "medium" },
+  { "id": "e86", "category": "meta", "input": "QAF, how do I report a wrong answer?", "expected": "correction-policy", "mustInclude": ["corrects", "openly"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e87", "category": "meta", "input": "QAF, can admins pause you?", "expected": "pause-policy", "mustInclude": ["pause"], "mustNotInclude": [], "severity": "low" }
 ]

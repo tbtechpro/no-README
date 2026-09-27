@@ -148,7 +148,7 @@
     "type": "deliverable",
     "title": "How to submit",
     "body": "Submit through the official cohort submission link only. Steps: 1) open the link early, 2) complete every required field, 3) confirm it no longer shows Draft, 4) submit before the deadline.",
-    "sourceLink": "pending-admin-link",
+    "sourceLink": "how-to-submit-reviewed-2026-09-27",
     "owner": "programme admin",
     "effectiveFrom": "2026-09-27",
     "expiresAt": null,
@@ -398,7 +398,7 @@
   {
     "id": "c34",
     "type": "meta",
-    "title": "How corrections work",
+    "title": "Corrections and admin pause switch",
     "body": "If QAF gives a wrong answer, it corrects it openly with a new message quoting the old one — never by quietly editing. Admins may pause QAF during incidents.",
     "sourceLink": "decisions-log-8",
     "owner": "programme admin",
