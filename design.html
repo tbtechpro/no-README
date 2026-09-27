@@ -126,7 +126,7 @@
     <div class="type-row" style="font-size:24px; font-weight:700">Heading 24 — Weekly Builder Recap</div>
     <div class="type-row" style="font-size:20px; font-weight:600">Heading 20 — Your next priority</div>
     <div class="type-row" style="font-size:16px; font-weight:600">Heading 16 — What changed</div>
-    <div class="type-row">Body 14 — Your deliverable is due <b>Friday, 25 September, at 6:00 p.m.</b> Submit it through the official cohort submission link.</div>
+    <div class="type-row">Body 14 — Your deliverable is due on the <b>announced date</b>. Submit it through the official cohort submission link.</div>
     <div class="type-row" style="color:var(--muted); font-size:12.5px">Muted 12.5 — Source: official cohort message &middot; QAF (AI assistant)</div>
   </section>
 
@@ -285,13 +285,13 @@ function brain(q){
     return "Thank you for letting me know. You don\u2019t need to explain personal details in the group. Please contact the designated programme admin privately — only an authorised human can decide an exception.";
   if(low.indexOf("moved")!==-1||low.indexOf("session")!==-1) return UNCERTAIN;
   if(low.indexOf("draft")!==-1||low.indexOf("screenshot")!==-1||low.indexOf("submission working")!==-1)
-    return "What I see: your submission form is still in <b>Draft</b>. Likely cause: it wasn\u2019t confirmed. Next: complete and confirm before <b>Friday, 25 September, 6:00 p.m.</b> via the official cohort link. Still Draft after confirming? Contact the designated admin privately.";
+    return "What I see: your submission form is still in <b>Draft</b>. Likely cause: it wasn\u2019t confirmed. Next: complete and confirm before <b>the announced deadline</b> via the official cohort link. Still Draft after confirming? Contact the designated admin privately.";
   if(low.indexOf("next")!==-1)
-    return "Next: complete this week\u2019s <b>prototype milestone</b>. By: <b>Friday, 25 September, 6:00 p.m.</b> Use: the required lesson + submission link. Stuck? Tell me: lesson / idea / build.";
+    return "Next: complete this week\u2019s <b>most important build task</b>. By: <b>the announced deadline (check the latest admin message)</b>. Use: the required lesson + submission link. Stuck? Tell me: lesson / idea / build.";
   if(low.indexOf("due")!==-1||low.indexOf("deadline")!==-1||low.indexOf("submission")!==-1){
-    if(mode==="steps") return "This week\u2019s deliverable is due <b>Friday, 25 September, at 6:00 p.m.</b><br>1) Open the official cohort submission link<br>2) Confirm it loads<br>3) Submit before the deadline";
-    if(mode==="explain") return "Think of the deliverable like a bus that leaves <b>Friday at 6pm</b> — be at the stop early. Submit through the official cohort link, and check the link opens today.";
-    return "This week\u2019s deliverable is due <b>Friday, 25 September, at 6:00 p.m.</b> Action: submit via the official cohort link. Next: confirm your link opens before the deadline.";
+    if(mode==="steps") return "To submit this week:<br>1) Open the official cohort submission link<br>2) Confirm it loads<br>3) Check the announced deadline<br>4) Submit before it";
+    if(mode==="explain") return "Think of the deliverable like a bus that leaves at <b>the announced time</b> — be at the stop early. Submit through the official cohort link, and check the link opens today.";
+    return "I do not have a confirmed answer to that yet. I\u2019ll direct it to the appropriate Qubators admin rather than guess. Until then, follow the current announced time.";
   }
   return UNCERTAIN;
 }

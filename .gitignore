@@ -33,3 +33,7 @@ prisma/*.db-journal
 # Local file storage (transient images/attachments)
 storage/*
 !storage/.gitkeep
+
+# Local runtime state (tickets, pause flag) — never commit
+data/tickets.json
+data/pause.json

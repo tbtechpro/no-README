@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { isInvoked } from "@/lib/qaf/invocation";
+import { answer } from "@/lib/qaf/pipeline";
 
-// Phase 0.5 skeleton — verification + intake ONLY. No LLM, no replies yet.
-// Full pipeline (gate → retrieval → composer → safety → sender) lands in Phase 1.
+// Phase 1 webhook: verification + intake + pipeline reply preview.
+// Outbound sending is still stubbed — sandbox needs WHATSAPP_ACCESS_TOKEN
+// before anything leaves this server (see doc/QAF-Sandbox-Setup.md).
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN ?? "";
 
@@ -25,14 +28,9 @@ type Intake = {
   invoked: boolean;
 };
 
-// Minimal invocation check (Phase 1 makes this robust: mentions, quote-replies).
-export function isInvoked(text: string): boolean {
-  return /(^|\W)qaf(\W|$)/i.test(text);
-}
-
-// Intake probe (POST). Ack fast, log, reply nothing — silence is correct for now.
+// Intake + answer (POST). Ack fast; reply preview returned for sandbox testing.
 export async function POST(req: Request) {
-  // TODO Phase 1: verify X-Hub-Signature-256 with WHATSAPP_APP_SECRET before parsing.
+  // TODO: verify X-Hub-Signature-256 with WHATSAPP_APP_SECRET before parsing.
   let body: unknown;
   try {
     body = await req.json();
@@ -50,7 +48,11 @@ export async function POST(req: Request) {
     hasImage: Boolean(msg.image),
     invoked: isInvoked(text),
   };
-  // TODO Phase 1: persist to DecisionLog + route to skills. For sandbox we just prove intake works.
   console.log("[qaf-intake]", JSON.stringify(intake));
-  return NextResponse.json({ ok: true, invoked: intake.invoked });
+  // TODO Phase 1.9: download image by media ID when hasImage, then pass imageType.
+  const result = answer(text, { msgId: intake.msgId });
+  console.log("[qaf-answer]", JSON.stringify({ skill: result.skill, handoff: result.handoff }));
+  // TODO: POST reply to Meta send API when WHATSAPP_ACCESS_TOKEN is set. Until
+  // then, silence on the wire is correct — preview only.
+  return NextResponse.json({ ok: true, invoked: intake.invoked, skill: result.skill, replyPreview: result.reply });
 }

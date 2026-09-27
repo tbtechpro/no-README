@@ -2,6 +2,7 @@
   "name": "qaf-support-ai",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "QAF Support AI — WhatsApp support companion for Qubators AI Foundry. App and database run locally for now.",
   "engines": {
     "node": ">=20"
