@@ -83,8 +83,9 @@ Payments/fees/billing, automated disciplinary/certification/exception decisions,
 AI Practical/
   README.md
   package.json / tsconfig.json / next.config.ts / .env.example
-  app/ (local console skeleton + /api/health)
+  app/ (local console skeleton + /api/health + /api/webhooks/whatsapp)
   prisma/schema.prisma (local SQLite)
+  data/corpus.seed.json (36 starter items) + data/eval-set.json (60 cases)
   storage/ (local, gitignored transient files)
   doc/
     QAF Support AI-PRD.md
