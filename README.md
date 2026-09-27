@@ -14,7 +14,7 @@ QAF Support AI answers routine programme questions in the Foundry WhatsApp group
 It is not a noisy chatbot, substitute instructor, or automated authority. Human admins, mentors, and facilitators remain responsible for decisions, feedback, and care.
 
 - Status: v0.1 — product direction + standard AI context + implementation plan + local scaffold, no bot logic yet
-- PRD: `doc/QAF Support AI-PRD.md` (v1.0, 19 Sept 2026)
+- PRD: `doc/QAF Support AI-PRD.md` (v1.1, 27 Sept 2026)
 - Standard context for implementation: `doc/QAF-Support-AI-Context.md`
 - Implementation plan: `doc/QAF-Implementation-Plan.md`
 - Architecture: `doc/QAF-Architecture.md`

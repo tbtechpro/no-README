@@ -8,9 +8,16 @@ The WhatsApp support companion for Qubators AI Foundry participants
 | :---- |
 
    
-Version 1.0  |  19 September 2026
+Version 1.1  |  27 September 2026
 
 Prepared for Qubators AI Foundry
+
+| Version | Date | Change |
+| :---- | :---- | :---- |
+| 1.0 | 19 September 2026 | Initial PRD. |
+| 1.1 | 27 September 2026 | F19 image and screenshot assistance promoted P1 → P0 (core from pilot); companion build docs indexed. No change to goals, non-goals or exclusions. |
+
+Companion documents (build guidance; this PRD remains authoritative on product direction and wins on any conflict): `doc/QAF-Support-AI-Context.md`, `doc/QAF-Implementation-Plan.md`, `doc/QAF-Architecture.md`, `doc/QAF-Design-System.md`, `design.html` (interactive preview).
 
 | Document field | Decision |
 | :---- | :---- |
@@ -160,7 +167,7 @@ Priority labels: P0 \= required for a trustworthy first release; P1 \= important
 | F16 | Mini challenges and quizzes | P2 | Offer short, optional learning checks tied to current lessons and building decisions. |
 | F17 | Idea-to-action prompt | P2 | Help a participant turn a problem idea into one small, testable action aligned with Foundry guidance. |
 | F18 | Participant feedback box | P1 | Collect suggestions, confusing instructions and support gaps; acknowledge receipt and route themes to admins. |
-| F19 | Image and screenshot assistance | P1 | Read and explain participant-shared screenshots and images—such as error messages, submission screens, lesson pages and build outputs—so what the participant sees becomes a clear next action, applying the same accuracy, privacy, escalation and show-only-confirmed-information rules as text answers. |
+| F19 | Image and screenshot assistance | P0 | Read and explain participant-shared screenshots and images—such as error messages, submission screens, lesson pages and build outputs—so what the participant sees becomes a clear next action, applying the same accuracy, privacy, escalation and show-only-confirmed-information rules as text answers. Required from the pilot release (promoted from P1 in v1.1). |
 
  
 
