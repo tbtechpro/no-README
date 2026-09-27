@@ -50,7 +50,8 @@ export async function POST(req: Request) {
   };
   console.log("[qaf-intake]", JSON.stringify(intake));
   // TODO Phase 1.9: download image by media ID when hasImage, then pass imageType.
-  const result = answer(text, { msgId: intake.msgId });
+  // Rate-limited per sender (5/min): burst floods go silent and get logged.
+  const result = answer(text, { msgId: intake.msgId, sender: intake.from, enforceRate: true });
   console.log("[qaf-answer]", JSON.stringify({ skill: result.skill, handoff: result.handoff }));
   // TODO: POST reply to Meta send API when WHATSAPP_ACCESS_TOKEN is set. Until
   // then, silence on the wire is correct — preview only.

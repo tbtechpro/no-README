@@ -71,5 +71,17 @@
   { "id": "e70", "category": "routine", "input": "QAF, when is the weekly assessment due?", "expected": "deadline-answer", "mustInclude": ["Sunday", "11:59"], "mustNotInclude": ["25 September"], "severity": "high" },
   { "id": "e71", "category": "encourage", "input": "QAF, I did nothing this week.", "expected": "encouragement", "mustInclude": ["next step"], "mustNotInclude": ["shame", "lazy", "behind"], "severity": "medium" },
   { "id": "e72", "category": "resource", "input": "QAF, where is the submission template?", "expected": "resource-fallback", "mustInclude": ["learn.qubators.org"], "mustNotInclude": [], "severity": "low" },
-  { "id": "e73", "category": "deadline", "input": "QAF, did the deadline change from Sunday?", "expected": "deadline-compare", "mustInclude": ["Sunday", "none announced"], "mustNotInclude": ["probably"], "severity": "medium" }
+  { "id": "e73", "category": "deadline", "input": "QAF, did the deadline change from Sunday?", "expected": "deadline-compare", "mustInclude": ["Sunday", "none announced"], "mustNotInclude": ["probably"], "severity": "medium" },
+  { "id": "e74", "category": "milestone", "input": "QAF, I finished my prototype!", "expected": "milestone", "mustInclude": ["Prototype unlocked", "Next"], "mustNotInclude": ["perfect", "genius"], "severity": "medium" },
+  { "id": "e75", "category": "milestone", "input": "QAF, I ran my first user test!", "expected": "milestone", "mustInclude": ["user test", "Next"], "mustNotInclude": [], "severity": "medium" },
+  { "id": "e76", "category": "milestone", "input": "QAF, I submitted!", "expected": "milestone", "mustInclude": ["Submission", "Next"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e77", "category": "spotlight", "input": "QAF, spotlight Ada, she helped me debug!", "expected": "spotlight-pending", "mustInclude": ["validat", "admin"], "mustNotInclude": ["leaderboard", "winner"], "severity": "medium" },
+  { "id": "e78", "category": "quiz", "input": "QAF, quiz me!", "expected": "quiz-ask", "mustInclude": ["Quiz", "QAF answer"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e79", "category": "quiz", "input": "QAF answer: draft", "expected": "quiz-correct", "mustInclude": ["Correct"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e80", "category": "quiz", "input": "QAF answer: submitted", "expected": "quiz-retry", "mustInclude": ["Not quite", "hint"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e81", "category": "idea", "input": "QAF, my idea: food delivery for hostels.", "expected": "idea-to-action", "mustInclude": ["smallest test"], "mustNotInclude": [], "severity": "medium" },
+  { "id": "e82", "category": "noise", "input": "QAF, too many messages from you.", "expected": "noise-apology", "mustInclude": ["logged", "admin"], "mustNotInclude": [], "severity": "medium" },
+  { "id": "e83", "category": "milestone", "input": "QAF, I improved my landing page!", "expected": "milestone", "mustInclude": ["Improvement", "Next"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e84", "category": "quiz", "input": "QAF, give me a challenge.", "expected": "quiz-ask", "mustInclude": ["Quiz"], "mustNotInclude": [], "severity": "low" },
+  { "id": "e85", "category": "noise", "input": "QAF, mute yourself.", "expected": "noise-apology", "mustInclude": ["logged"], "mustNotInclude": [], "severity": "medium" }
 ]

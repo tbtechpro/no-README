@@ -40,6 +40,18 @@ async function togglePause() {
   redirect("/admin");
 }
 
+async function validateSpotlight(formData: FormData) {
+  "use server";
+  const id = String(formData.get("id") ?? "");
+  const file = dataFile("tickets.json");
+  if (!existsSync(file)) redirect("/admin");
+  const all = JSON.parse(readFileSync(file, "utf8")) as Ticket[];
+  const t = all.find((x) => x.id === id);
+  if (t && t.category === "spotlight") t.status = "validated";
+  writeFileSync(file, JSON.stringify(all, null, 2));
+  redirect("/admin");
+}
+
 export default function Admin() {
   const corpus = readJson<CorpusItem[]>("corpus.seed.json", []);
   const tickets = readJson<Ticket[]>("tickets.json", []);
@@ -88,6 +100,17 @@ export default function Admin() {
       <h2>Patterns — confusion themes</h2>
       {patterns.size === 0 ? <p>No open tickets yet — patterns appear as handoffs land.</p> : (
         <ul>{[...patterns.entries()].map(([cat, n]) => <li key={cat}>{cat}: {n} open</li>)}</ul>
+      )}
+
+      <h2>Spotlight — peer nominations awaiting validation</h2>
+      {open.filter((t) => t.category === "spotlight").length === 0 ? <p>No nominations pending. Recognition is confirmed here, never by votes.</p> : (
+        <ul>{open.filter((t) => t.category === "spotlight").map((t) => (
+          <li key={t.id}>{t.id} · {t.at}{" "}
+            <form action={validateSpotlight} style={{ display: "inline" }}>
+              <input type="hidden" name="id" value={t.id} />
+              <button type="submit" style={{ background: "#1F7A3D", color: "#fff", border: "none", borderRadius: 6, padding: "4px 12px", cursor: "pointer" }}>Validate</button>
+            </form>
+          </li>))}</ul>
       )}
 
       <h2>Review queue — {open.length} open</h2>
