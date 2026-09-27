@@ -87,13 +87,13 @@
     "id": "c08",
     "type": "schedule",
     "title": "Weekly deliverable deadline",
-    "body": "No weekly deadline is confirmed on file yet — follow the latest admin announcement. QAF will not guess dates; unconfirmed deadlines are always referred to the admin.",
-    "sourceLink": "TBD-cohort-calendar",
+    "body": "Weekly assessments are due Sundays at 11:59 p.m. (WAT) unless the admin announces otherwise. Submit through the official cohort submission link and confirm it no longer shows Draft.",
+    "sourceLink": "admin-announcement-confirmed-2026-09-27",
     "owner": "programme admin",
     "effectiveFrom": "2026-09-27",
     "expiresAt": null,
-    "version": 1,
-    "status": "draft"
+    "version": 2,
+    "status": "approved"
   },
   {
     "id": "c09",
