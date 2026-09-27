@@ -1,0 +1,3 @@
+# Invoked-image / attachment storage (local only).
+# Files here are transient (TTL-deleted) and must never be committed.
+# This placeholder keeps the directory tracked by git.

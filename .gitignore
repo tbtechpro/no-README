@@ -21,3 +21,15 @@ __pycache__/
 .venv/
 node_modules/
 dist/
+
+# Next.js local run
+.next/
+next-env.d.ts
+
+# Local SQLite (the DB is a local file for now)
+prisma/*.db*
+prisma/*.db-journal
+
+# Local file storage (transient images/attachments)
+storage/*
+!storage/.gitkeep

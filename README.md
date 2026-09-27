@@ -13,13 +13,30 @@ QAF Support AI answers routine programme questions in the Foundry WhatsApp group
 
 It is not a noisy chatbot, substitute instructor, or automated authority. Human admins, mentors, and facilitators remain responsible for decisions, feedback, and care.
 
-- Status: v0.1 initial version — product direction + standard AI context + implementation plan, no code yet
+- Status: v0.1 — product direction + standard AI context + implementation plan + local scaffold, no bot logic yet
 - PRD: `doc/QAF Support AI-PRD.md` (v1.0, 19 Sept 2026)
 - Standard context for implementation: `doc/QAF-Support-AI-Context.md`
 - Implementation plan: `doc/QAF-Implementation-Plan.md`
 - Architecture: `doc/QAF-Architecture.md`
 - Design system (chat + admin UI): `doc/QAF-Design-System.md`
 - Copilot instructions: `.github/muse-instructions.md`
+
+## Stack (free, local-first)
+
+> **App and database run locally for now.** `npm.cmd run dev` serves the Next.js
+> app; Prisma uses the local SQLite file `prisma/dev.db`. No cloud hosting, no
+> external DB, no external auth or storage. Auth is **deferred** — no login
+> exists yet (single builder, local only); it arrives with the Admin Console MVP.
+
+| Layer | Choice |
+|---|---|
+| Framework (API + admin console) | Next.js 15, App Router, TypeScript |
+| Database | SQLite file via Prisma ORM (`DATABASE_URL="file:./dev.db"`) |
+| Auth | Deferred — allowlist placeholder in `.env.example` |
+| File storage | Local `./storage/` behind a swappable interface |
+
+Run locally: copy `.env.example` to `.env`, then `npm.cmd install`,
+`npm.cmd run db:push`, `npm.cmd run dev` → http://localhost:3000 (`/api/health`).
 
 ## Who it serves
 
@@ -65,6 +82,10 @@ Payments/fees/billing, automated disciplinary/certification/exception decisions,
 ```
 AI Practical/
   README.md
+  package.json / tsconfig.json / next.config.ts / .env.example
+  app/ (local console skeleton + /api/health)
+  prisma/schema.prisma (local SQLite)
+  storage/ (local, gitignored transient files)
   doc/
     QAF Support AI-PRD.md
     QAF-Support-AI-Context.md

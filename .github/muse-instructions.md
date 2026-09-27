@@ -25,5 +25,6 @@ WhatsApp support companion for Qubators AI Foundry. Help participants know what 
 - Do not repeat answered questions unless asked or info changed. Correct misinformation gently on facts.
 
 ## Code guidance
+- Stack: Next.js 15 App Router + TypeScript, Prisma SQLite (local `prisma/dev.db`), local `./storage/`. App and DB run locally for now. No auth yet — do not add login; admin allowlist placeholder only.
 - Prefer minimal, readable changes. Keep WhatsApp-friendly short outputs.
 - For prompts/handlers, keep invocation-gating, uncertainty referral text verbatim, and image privacy gate intact. Do not weaken handoff logic.

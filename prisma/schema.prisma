@@ -1,0 +1,78 @@
+// QAF Support AI — local-first database.
+// Provider is SQLite: the database is a local file (prisma/dev.db).
+// `DATABASE_URL="file:./dev.db"` in .env. No cloud DB server needed.
+// Prisma schema migrates to Postgres later without model changes.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model CorpusItem {
+  id            String    @id @default(cuid())
+  type          String
+  title         String
+  body          String
+  sourceLink    String?
+  owner         String
+  effectiveFrom DateTime
+  expiresAt     DateTime?
+  version       Int       @default(1)
+  status        String    @default("draft") // draft | approved | retired
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model DecisionLog {
+  id        String   @id @default(cuid())
+  msgId     String   @unique
+  invoked   Boolean
+  skill     String?
+  corpusIds String   @default("[]") // JSON array of cited corpus item IDs
+  handoff   Boolean  @default(false)
+  owner     String?
+  latencyMs Int?
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id              String    @id @default(cuid())
+  category        String
+  owner           String
+  slaDue          DateTime?
+  status          String    @default("open") // open | resolved | dropped
+  redactedExcerpt String?
+  resolutionId    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Reminder {
+  id       String   @id @default(cuid())
+  event    String
+  audience String
+  sendAt   DateTime
+  wording  String
+  status   String   @default("scheduled") // scheduled | sent | cancelled
+}
+
+model Correction {
+  id        String   @id @default(cuid())
+  badMsgId  String
+  fixText   String
+  audience  String
+  sentAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model ImageJob {
+  id           String    @id @default(cuid())
+  msgId        String    @unique
+  downloadedAt DateTime  @default(now())
+  deletedAt    DateTime?
+  privacyFlag  Boolean   @default(false)
+}
