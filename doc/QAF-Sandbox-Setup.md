@@ -30,6 +30,7 @@ Status: TUNNEL LIVE · webhook handshake VERIFIED 4 Oct 2026 · Meta-side steps 
 ## C. Acceptance checklist (all must pass before Phase 1)
 
 - [x] Text received + logged with `invoked:true` on "QAF, …" — verified 4 Oct 2026 (`QAF, ping` from 2348078239107 → ticket QAF-328)
+- [x] Outbound reply delivered on WhatsApp — verified 4 Oct 2026 (deadline answer, `ok:true` + Meta wamid in `data/send.log`; payload must use `text.body` shape)
 - [x] Reply-to-QAF detection verified against provider behaviour — Meta Test-button payload arrived and stayed silent (`invoked:false`), 4 Oct 2026
 - [x] Non-invoked chatter logged with `invoked:false`, zero replies sent — same test
 - [ ] Image with caption received + logged with `hasImage:true`
