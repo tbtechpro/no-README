@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { appendFile } from "node:fs";
+import { join } from "node:path";
 import { isInvoked } from "@/lib/qaf/invocation";
 import { answer } from "@/lib/qaf/pipeline";
 
 // Phase 1 webhook: verification + intake + pipeline reply + outbound send.
 // Outbound sends only engine-produced replies via the Meta send API.
+// Send attempts are appended to data/send.log (gitignored) for sandbox visibility.
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN ?? "";
 
@@ -56,6 +59,11 @@ export async function POST(req: Request) {
   console.log("[qaf-answer]", JSON.stringify({ skill: result.skill, handoff: result.handoff }));
   // Outbound: send the reply back on WhatsApp ONLY when the engine produced
   // one. Silent skills (non-invoked, rate-limited, privacy-held) send nothing.
+  const sendLog = (entry: object) => {
+    try {
+      appendFile(join(process.cwd(), "data", "send.log"), JSON.stringify({ at: new Date().toISOString(), ...entry }) + "\n", () => {});
+    } catch { /* best effort */ }
+  };
   if (result.reply && intake.from && intake.from !== "unknown") {
     const token = process.env.WHATSAPP_ACCESS_TOKEN ?? "";
     const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID ?? "";
@@ -72,14 +80,22 @@ export async function POST(req: Request) {
           }),
         });
         const data = await res.json().catch(() => ({}));
-        console.log("[qaf-send]", JSON.stringify({ ok: res.ok, status: res.status, id: data?.messages?.[0]?.id ?? null, error: data?.error?.message ?? null }));
+        const entry = { ok: res.ok, status: res.status, id: data?.messages?.[0]?.id ?? null, error: data?.error?.message ?? null, to: intake.from, skill: result.skill };
+        console.log("[qaf-send]", JSON.stringify(entry));
+        sendLog(entry);
       } catch (err) {
         // Never break the 200 ack: log and keep going.
-        console.log("[qaf-send]", JSON.stringify({ ok: false, error: String(err) }));
+        const entry = { ok: false, error: String(err), to: intake.from, skill: result.skill };
+        console.log("[qaf-send]", JSON.stringify(entry));
+        sendLog(entry);
       }
     } else {
-      console.log("[qaf-send]", JSON.stringify({ ok: false, error: "missing-access-token-or-phone-id" }));
+      const entry = { ok: false, error: "missing-access-token-or-phone-id", to: intake.from, skill: result.skill };
+      console.log("[qaf-send]", JSON.stringify(entry));
+      sendLog(entry);
     }
+  } else {
+    sendLog({ ok: true, skipped: "silent-skill", to: intake.from, skill: result.skill });
   }
   return NextResponse.json({ ok: true, invoked: intake.invoked, skill: result.skill, replyPreview: result.reply });
 }
