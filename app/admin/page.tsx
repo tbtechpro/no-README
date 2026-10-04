@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { redirect } from "next/navigation";
 import { earlyFinal } from "@/lib/qaf/reminders";
 import { computeMetrics } from "@/lib/qaf/metrics";
+import { currentDeadline } from "@/lib/qaf/corpus";
+import { loadProposal, applyProposal } from "@/lib/qaf/deadlines";
 
 // Admin console (local only, no login yet — auth arrives with real deployment).
 // Corpus browser + pause switch + ticket queue + patterns + deadline/reminders.
@@ -53,10 +55,16 @@ async function validateSpotlight(formData: FormData) {
   redirect("/admin");
 }
 
+async function approveProposal() {
+  "use server";
+  const p = loadProposal();
+  if (p) applyProposal(p);
+  redirect("/admin");
+}
+
 type CorpusSeedItem = CorpusItem & { body: string; sourceLink: string | null; effectiveFrom: string; expiresAt: string | null; version: number };
 
-async function setCorpusStatus(formData: FormData) {
-  "use server";
+async function setCorpusStatus(formData: FormData) {  "use server";
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (!["approved", "draft", "retired"].includes(status)) redirect("/admin");
@@ -83,6 +91,8 @@ export default function Admin() {
   const { early, final } = earlyFinal(deadline);
   const fmt = (d: Date) => d.toUTCString();
   const m = computeMetrics();
+  const activeDeadline = currentDeadline();
+  const proposal = loadProposal();
 
   return (
     <main style={{ maxWidth: 900, margin: "32px auto", padding: "0 24px", lineHeight: 1.5, fontFamily: "Segoe UI, system-ui, sans-serif" }}>
@@ -137,7 +147,19 @@ export default function Admin() {
 
       <h2>Deadline + reminders</h2>
       <p>Weekly assessment due: <b>{fmt(deadline)}</b> (Sundays 23:59 WAT).<br />
+        Active deadline on file: <b>{activeDeadline ?? "none confirmed"}</b><br />
         Early reminder: {fmt(early)} · Final reminder: {fmt(final)} (admin-created only).</p>
+      <h3>Deadline governance</h3>
+      {proposal ? (
+        <div>
+          <p>Pending proposal: <b>{proposal.label}</b> (by {proposal.by}, {proposal.at})</p>
+          <form action={approveProposal}>
+            <button type="submit" style={{ background: "#0E6B6B", color: "#fff", border: "none", borderRadius: 6, padding: "10px 18px", fontWeight: 700, cursor: "pointer" }}>
+              Approve + apply
+            </button>
+          </form>
+        </div>
+      ) : <p>No pending deadline proposal. Admin announcements in the group create one automatically; nothing applies without confirmation.</p>}
 
       <h2>Patterns — confusion themes</h2>
       {patterns.size === 0 ? <p>No open tickets yet — patterns appear as handoffs land.</p> : (

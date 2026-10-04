@@ -11,7 +11,7 @@ Confirmed 27 September 2026 with the programme owner (recommended defaults accep
 | 4 | Private 1:1 support | No 1:1 bot DMs. Sensitive matters go to a human's private contact; QAF only points the way in the group. | Confirmed |
 | 5 | Age range / safeguarding | All participants 18+. Standard safeguarding applies; any minor intake triggers a rules review before use. | Confirmed |
 | 6 | Faith language | Neutral plain language by default. Mirror a participant's own faith wording briefly in celebrations only; never in sensitive situations. | Confirmed |
-| 7 | Cohort calendar | Weekly assessment: Sundays 11:59 p.m. (WAT), confirmed by owner 27 Sept 2026. Session times, submission links and final-product scope still pending. | **Confirmed (deadline) — rest pending** |
+| 7 | Cohort calendar | Weekly assessment: Sundays 11:59 p.m. (WAT), confirmed by owner 27 Sept 2026. Changes stay consistent automatically: admin announcements in the group create a proposal, applied only after admin CONFIRM (old→new announced). Session times, submission links and final-product scope still pending. | **Confirmed (deadline) — rest pending** |
 | 8 | Correction process | Wrong answer → new message quoting the old one with the fix + brief apology. Never silent edits. Admins can pause QAF during incidents. | Confirmed |
 
 Actual names, phone numbers and links for owners/routes must be added here before pilot; QAF will never publish a placeholder as fact.

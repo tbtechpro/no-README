@@ -34,6 +34,8 @@ prisma/*.db-journal
 storage/*
 !storage/.gitkeep
 
-# Local runtime state (tickets, pause flag) — never commit
+# Local runtime state (tickets, pause flag, deadline overlay/proposals) — never commit
 data/tickets.json
 data/pause.json
+data/deadline.json
+data/deadline-proposal.json
