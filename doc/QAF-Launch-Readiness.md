@@ -7,7 +7,8 @@ controlled pilot (small participant group, Phase 1 scope).
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Eval regression green | ✅ 87/87 | `npm.cmd run check` (eval + freshness) |
+| Eval regression green | ✅ 92/92 | `npm.cmd run check` (eval + freshness) |
+| Production build | ✅ passes | `npm.cmd run build` (incl. deadline-governance types) |
 | Corpus approved, no placeholders served | ✅ 36/40 approved | `node scripts/freshness.mjs`; drafts never answer |
 | Authoritative deadline wired | ✅ Sundays 11:59 p.m. WAT (c08) | Owner-confirmed 27 Sept 2026 |
 | Uncertainty + handoff paths | ✅ | Verbatim line, 8 owner-routed categories, tickets |

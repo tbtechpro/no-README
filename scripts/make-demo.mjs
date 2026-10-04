@@ -1,10 +1,13 @@
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync } from "node:fs";
 import { answer } from "../lib/qaf/pipeline.js";
 import { computeMetrics } from "../lib/qaf/metrics.js";
 
 // Builds demo.html: an auto-playing animated product demo.
 // Every QAF reply is computed by the REAL pipeline (no mock text).
 // Run: node scripts/make-demo.mjs  (re-run after engine changes)
+
+const evalSet = JSON.parse(readFileSync(new URL("../data/eval-set.json", import.meta.url), "utf8"));
+const EVAL_N = evalSet.length;
 
 const esc = (s) =>
   String(s ?? "")
@@ -73,7 +76,7 @@ const html = `<!DOCTYPE html>
 <div class="phone"><div class="pbar">Qubators AI Foundry<small>QAF (AI assistant) · pilot group</small></div><div id="chat"></div></div>
 <div id="controls"><button id="playBtn">⏸ Pause</button><button id="replayBtn" class="ghost">↺ Replay</button></div>
 <div id="stats">
-  <div><b>87/87</b>eval cases green</div>
+  <div><b>${EVAL_N}/${EVAL_N}</b>eval cases green</div>
   <div><b>${m.invoked}</b>answers logged locally</div>
   <div><b>${m.handoffs}</b>human handoffs</div>
   <div><b>Sun 11:59pm</b>authoritative deadline</div>
@@ -93,7 +96,7 @@ function bubble(cls, html, who){
 }
 function playScene(i){
   if (i >= SCENES.length) {
-    cap.textContent = "Demo complete — eval 87/87 · freshness OK · ready for pilot. ↺ Replay anytime.";
+     cap.textContent = "Demo complete — eval ${EVAL_N}/${EVAL_N} · freshness OK · ready for pilot. ↺ Replay anytime.";
     fill.style.width = "100%"; playBtn.textContent = "▶ Play"; playing = false; return;
   }
   var s = SCENES[i];
