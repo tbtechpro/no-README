@@ -29,10 +29,10 @@ Status: TUNNEL LIVE · webhook handshake VERIFIED 4 Oct 2026 · Meta-side steps 
 
 ## C. Acceptance checklist (all must pass before Phase 1)
 
-- [ ] Text received + logged with `invoked:true` on "QAF, …"
+- [x] Text received + logged with `invoked:true` on "QAF, …" — verified 4 Oct 2026 (`QAF, ping` from 2348078239107 → ticket QAF-328)
+- [x] Reply-to-QAF detection verified against provider behaviour — Meta Test-button payload arrived and stayed silent (`invoked:false`), 4 Oct 2026
+- [x] Non-invoked chatter logged with `invoked:false`, zero replies sent — same test
 - [ ] Image with caption received + logged with `hasImage:true`
-- [ ] Reply-to-QAF detection verified against provider behaviour
-- [ ] Non-invoked chatter logged with `invoked:false`, zero replies sent
 - [ ] 20 duplicate questions collapse to one intake pattern (dedupe design validated)
 - [ ] Replies stay under ~400 chars in provider preview
 
