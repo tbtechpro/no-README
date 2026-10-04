@@ -1,12 +1,13 @@
-import { readFileSync, existsSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 import { redirect } from "next/navigation";
+import type { Ticket } from "@prisma/client";
 import { earlyFinal } from "@/lib/qaf/reminders";
 import { computeMetrics } from "@/lib/qaf/metrics";
-import { currentDeadline } from "@/lib/qaf/corpus";
+import { loadCorpusMerged, setItemStatus, currentDeadline } from "@/lib/qaf/corpus";
 import { loadProposal, applyProposal } from "@/lib/qaf/deadlines";
+import { isPaused, setPaused, listTickets, validateTicket } from "@/lib/qaf/store";
 
 // Admin console (local only, no login yet — auth arrives with real deployment).
+// Reads/writes go through Prisma (SQLite locally, Postgres hosted).
 // Corpus browser + pause switch + ticket queue + patterns + deadline/reminders.
 
 // Next Sunday 23:59 WAT (UTC+1) from now.
@@ -19,70 +20,41 @@ function nextSundayDeadline(from = new Date()): Date {
   return d;
 }
 
-function dataFile(name: string) {
-  return join(process.cwd(), "data", name);
-}
-
-function readJson<T>(name: string, fallback: T): T {
-  try {
-    const f = dataFile(name);
-    if (!existsSync(f)) return fallback;
-    return JSON.parse(readFileSync(f, "utf8")) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-type CorpusItem = { id: string; type: string; title: string; body: string; owner: string; status: string };
-type Ticket = { id: string; category: string; owner: string; status: string; at: string };
-
 async function togglePause() {
   "use server";
-  const cur = readJson<{ paused: boolean }>("pause.json", { paused: false });
-  writeFileSync(dataFile("pause.json"), JSON.stringify({ paused: !cur.paused, at: new Date().toISOString() }, null, 2));
+  setPaused(!(await isPaused()));
   redirect("/admin");
 }
 
 async function validateSpotlight(formData: FormData) {
   "use server";
   const id = String(formData.get("id") ?? "");
-  const file = dataFile("tickets.json");
-  if (!existsSync(file)) redirect("/admin");
-  const all = JSON.parse(readFileSync(file, "utf8")) as Ticket[];
-  const t = all.find((x) => x.id === id);
-  if (t && t.category === "spotlight") t.status = "validated";
-  writeFileSync(file, JSON.stringify(all, null, 2));
+  await validateTicket(id);
   redirect("/admin");
 }
 
 async function approveProposal() {
   "use server";
-  const p = loadProposal();
-  if (p) applyProposal(p);
+  const p = await loadProposal();
+  if (p) await applyProposal(p);
   redirect("/admin");
 }
 
-type CorpusSeedItem = CorpusItem & { body: string; sourceLink: string | null; effectiveFrom: string; expiresAt: string | null; version: number };
-
-async function setCorpusStatus(formData: FormData) {  "use server";
+async function setCorpusStatus(formData: FormData) {
+  "use server";
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (!["approved", "draft", "retired"].includes(status)) redirect("/admin");
-  const file = dataFile("corpus.seed.json");
-  const all = JSON.parse(readFileSync(file, "utf8")) as CorpusSeedItem[];
-  const item = all.find((x) => x.id === id);
-  if (item) {
-    item.status = status;
-    item.version += 1;
-    writeFileSync(file, JSON.stringify(all, null, 2));
-  }
+  await setItemStatus(id, status);
   redirect("/admin");
 }
 
-export default function Admin() {
-  const corpus = readJson<CorpusItem[]>("corpus.seed.json", []);
-  const tickets = readJson<Ticket[]>("tickets.json", []);
-  const paused = readJson<{ paused: boolean }>("pause.json", { paused: false }).paused;
+const fmtDate = (d: Date | string) => new Date(d).toUTCString();
+
+export default async function Admin() {
+  const corpus = await loadCorpusMerged();
+  const tickets = (await listTickets()) as Ticket[];
+  const paused = await isPaused();
   const approved = corpus.filter((c) => c.status === "approved").length;
   const open = tickets.filter((t) => t.status === "open");
   const patterns = new Map<string, number>();
@@ -90,9 +62,9 @@ export default function Admin() {
   const deadline = nextSundayDeadline();
   const { early, final } = earlyFinal(deadline);
   const fmt = (d: Date) => d.toUTCString();
-  const m = computeMetrics();
-  const activeDeadline = currentDeadline();
-  const proposal = loadProposal();
+  const m = await computeMetrics();
+  const activeDeadline = await currentDeadline();
+  const proposal = await loadProposal();
 
   return (
     <main style={{ maxWidth: 900, margin: "32px auto", padding: "0 24px", lineHeight: 1.5, fontFamily: "Segoe UI, system-ui, sans-serif" }}>
@@ -139,7 +111,7 @@ export default function Admin() {
         </tbody>
       </table>
 
-      <h2>Metrics — pilot baseline (local decision log)</h2>
+      <h2>Metrics — pilot baseline (decision log)</h2>
       <p>Answered: {m.invoked} · Silent (not invoked): {m.silent} · Handoffs: {m.handoffs} ({m.handoffRate}%) ·
         Rate-limited: {m.rateLimited} · Post-check blocks: {m.postcheckFails} ·
         Tickets: {m.tickets} ({m.openTickets} open).</p>
@@ -152,7 +124,7 @@ export default function Admin() {
       <h3>Deadline governance</h3>
       {proposal ? (
         <div>
-          <p>Pending proposal: <b>{proposal.label}</b> (by {proposal.by}, {proposal.at})</p>
+          <p>Pending proposal: <b>{proposal.label}</b> (by {proposal.by}, {fmtDate(proposal.at)})</p>
           <form action={approveProposal}>
             <button type="submit" style={{ background: "#0E6B6B", color: "#fff", border: "none", borderRadius: 6, padding: "10px 18px", fontWeight: 700, cursor: "pointer" }}>
               Approve + apply
@@ -169,7 +141,7 @@ export default function Admin() {
       <h2>Spotlight — peer nominations awaiting validation</h2>
       {open.filter((t) => t.category === "spotlight").length === 0 ? <p>No nominations pending. Recognition is confirmed here, never by votes.</p> : (
         <ul>{open.filter((t) => t.category === "spotlight").map((t) => (
-          <li key={t.id}>{t.id} · {t.at}{" "}
+          <li key={t.id}>{t.id} · {fmtDate(t.createdAt)}{" "}
             <form action={validateSpotlight} style={{ display: "inline" }}>
               <input type="hidden" name="id" value={t.id} />
               <button type="submit" style={{ background: "#1F7A3D", color: "#fff", border: "none", borderRadius: 6, padding: "4px 12px", cursor: "pointer" }}>Validate</button>
@@ -179,9 +151,9 @@ export default function Admin() {
 
       <h2>Review queue — {open.length} open</h2>
       {open.length === 0 ? <p>Queue empty. Handoffs, corrections and uncertainty referrals land here.</p> : (
-        <ul>{open.map((t) => <li key={t.id}>{t.id} · {t.category} → {t.owner} · {t.at}</li>)}</ul>
+        <ul>{open.map((t) => <li key={t.id}>{t.id} · {t.category} → {t.owner} · {fmtDate(t.createdAt)}</li>)}</ul>
       )}
-      <p style={{ color: "#5F6B6B", fontSize: 12 }}>Eval: run <code>node scripts/eval.mjs</code> locally (73 cases). Publish/retire editing + fresh-sweep view land in Phase 4.</p>
+      <p style={{ color: "#5F6B6B", fontSize: 12 }}>Eval: run <code>npm.cmd run check</code> locally (92 cases). Publish/retire editing + fresh-sweep view land in Phase 4.</p>
     </main>
   );
 }

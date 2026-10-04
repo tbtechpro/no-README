@@ -1,19 +1,29 @@
-import { readFileSync, existsSync, unlinkSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { answer } from "../lib/qaf/pipeline.js";
+import { prisma } from "../lib/qaf/db.js";
 
-// Zero-dependency eval: node scripts/eval.mjs [--only e01,e02]
+// Eval: node scripts/eval.mjs [--only=e01,e02]
 // Checks reply contents case-insensitively; silence cases must return null.
-// Deadline-governance state is reset around the run so e88+ stay deterministic.
+// Runs against the database (SQLite locally): governance + log tables are
+// reset around the run so e88+ stay deterministic without touching live rows
+// beyond the run (tables are shared with dev — eval traffic is synthetic).
 
-const overlayUrl = new URL("../data/deadline.json", import.meta.url);
-const proposalUrl = new URL("../data/deadline-proposal.json", import.meta.url);
-let savedOverlay = null;
+// Snapshot live governance rows, then reset for determinism.
+const saved = {};
 try {
-  if (existsSync(overlayUrl)) savedOverlay = readFileSync(overlayUrl);
-} catch { /* none */ }
-for (const u of [overlayUrl, proposalUrl]) {
-  try { unlinkSync(u); } catch { /* none */ }
+  saved.overlay = await prisma.deadlineOverlay.findUnique({ where: { id: "active" } });
+  saved.proposal = await prisma.deadlineProposal.findUnique({ where: { id: "single" } });
+  saved.pause = await prisma.pauseState.findUnique({ where: { id: "global" } });
+} catch (err) {
+  console.error("EVAL: database unreachable — run `npm.cmd run db:push` first.");
+  process.exit(2);
 }
+await prisma.decisionLog.deleteMany();
+await prisma.ticket.deleteMany();
+await prisma.deadlineProposal.deleteMany();
+await prisma.deadlineOverlay.deleteMany();
+await prisma.corpusStatusOverride.deleteMany();
+await prisma.pauseState.deleteMany();
 
 const onlyArg = process.argv.find((a) => a.startsWith("--only="));
 const only = onlyArg ? new Set(onlyArg.split("=")[1].split(",")) : null;
@@ -27,7 +37,7 @@ for (const c of cases) {
   if (only && !only.has(c.id)) continue;
   let r;
   try {
-    r = answer(c.input, { imageType: c.imageType, msgId: c.id, isAdmin: c.isAdmin === true, sender: c.sender });
+    r = await answer(c.input, { imageType: c.imageType, msgId: c.id, isAdmin: c.isAdmin === true, sender: c.sender });
   } catch (err) {
     fails.push({ id: c.id, reason: `threw: ${err.message}` });
     continue;
@@ -54,9 +64,15 @@ for (const f of fails) {
   for (const p of f.problems) console.log(`  - ${p}`);
   if (f.reply) console.log(`  > ${f.reply}`);
 }
-if (savedOverlay) {
-  try { writeFileSync(overlayUrl, savedOverlay); } catch { /* best effort */ }
-} else {
-  try { unlinkSync(overlayUrl); } catch { /* none */ }
-}
+// Restore live governance rows; drop synthetic eval traffic.
+await prisma.decisionLog.deleteMany();
+await prisma.ticket.deleteMany();
+await prisma.deadlineProposal.deleteMany();
+await prisma.deadlineOverlay.deleteMany();
+await prisma.corpusStatusOverride.deleteMany();
+await prisma.pauseState.deleteMany();
+if (saved.overlay) await prisma.deadlineOverlay.create({ data: { id: "active", label: saved.overlay.label, source: saved.overlay.source, by: saved.overlay.by } });
+if (saved.proposal) await prisma.deadlineProposal.create({ data: { id: "single", label: saved.proposal.label, by: saved.proposal.by } });
+if (saved.pause) await prisma.pauseState.create({ data: { id: "global", paused: saved.pause.paused } });
+await prisma.$disconnect();
 process.exit(fails.length ? 1 : 0);

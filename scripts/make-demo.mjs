@@ -1,6 +1,7 @@
 import { writeFileSync, readFileSync } from "node:fs";
 import { answer } from "../lib/qaf/pipeline.js";
 import { computeMetrics } from "../lib/qaf/metrics.js";
+import { prisma } from "../lib/qaf/db.js";
 
 // Builds demo.html: an auto-playing animated product demo.
 // Every QAF reply is computed by the REAL pipeline (no mock text).
@@ -25,12 +26,14 @@ const scenes = [
   { caption: "Scene 6 · Engagement — real outputs celebrated, never volume", user: "QAF, I finished my prototype!", opts: {} },
 ];
 
-const played = scenes.map((s, i) => {
-  const r = answer(s.user, { msgId: `demo-${i}` });
-  return { ...s, reply: r.reply ?? "(silent — not invoked)", skill: r.skill, handoff: r.handoff };
-});
+const played = [];
+for (let i = 0; i < scenes.length; i++) {
+  const s = scenes[i];
+  const r = await answer(s.user, { msgId: `demo-${i}` });
+  played.push({ ...s, reply: r.reply ?? "(silent — not invoked)", skill: r.skill, handoff: r.handoff });
+}
 
-const m = computeMetrics();
+const m = await computeMetrics();
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -129,3 +132,4 @@ start();
 
 writeFileSync(new URL("../demo.html", import.meta.url), html);
 console.log(`demo.html written (${played.length} live scenes, metrics embedded).`);
+await prisma.$disconnect();

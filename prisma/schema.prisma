@@ -1,7 +1,45 @@
-// QAF Support AI — local-first database.
-// Provider is SQLite: the database is a local file (prisma/dev.db).
-// `DATABASE_URL="file:./dev.db"` in .env. No cloud DB server needed.
-// Prisma schema migrates to Postgres later without model changes.
+// QAF Support AI — database (SQLite locally, Postgres on Vercel/Neon).
+// Same models on both providers: String/DateTime/Boolean/Int only.
+// Runtime state lives here (never local JSON on hosted deploys).
+
+model CorpusStatusOverride {
+  itemId    String   @id // seed item id, e.g. "c09"
+  status    String // approved | draft | retired
+  version   Int
+  updatedAt DateTime @updatedAt
+}
+
+model DeadlineProposal {
+  id    String   @id @default("single") // one pending proposal at a time
+  label String
+  by    String
+  at    DateTime @default(now())
+}
+
+model DeadlineOverlay {
+  id     String   @id @default("active") // the applied deadline
+  label  String
+  source String   @default("admin-announcement")
+  by     String
+  at     DateTime @default(now())
+}
+
+model PauseState {
+  id     String   @id @default("global")
+  paused Boolean  @default(false)
+  at     DateTime @updatedAt
+}
+
+model SendLog {
+  id        String   @id @default(cuid())
+  to        String
+  skill     String
+  ok        Boolean
+  status    Int?
+  metaId    String?
+  error     String?
+  createdAt DateTime @default(now())
+}
 
 generator client {
   provider = "prisma-client-js"
