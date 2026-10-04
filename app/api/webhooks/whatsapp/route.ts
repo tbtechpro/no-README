@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { isInvoked } from "@/lib/qaf/invocation";
 import { answer } from "@/lib/qaf/pipeline";
 
-// Phase 1 webhook: verification + intake + pipeline reply preview.
-// Outbound sending is still stubbed — sandbox needs WHATSAPP_ACCESS_TOKEN
-// before anything leaves this server (see doc/QAF-Sandbox-Setup.md).
+// Phase 1 webhook: verification + intake + pipeline reply + outbound send.
+// Outbound sends only engine-produced replies via the Meta send API.
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN ?? "";
 
@@ -55,7 +54,32 @@ export async function POST(req: Request) {
   const adminNumbers = (process.env.ADMIN_NUMBERS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
   const result = answer(text, { msgId: intake.msgId, sender: intake.from, enforceRate: true, isAdmin: adminNumbers.includes(intake.from) });
   console.log("[qaf-answer]", JSON.stringify({ skill: result.skill, handoff: result.handoff }));
-  // TODO: POST reply to Meta send API when WHATSAPP_ACCESS_TOKEN is set. Until
-  // then, silence on the wire is correct — preview only.
+  // Outbound: send the reply back on WhatsApp ONLY when the engine produced
+  // one. Silent skills (non-invoked, rate-limited, privacy-held) send nothing.
+  if (result.reply && intake.from && intake.from !== "unknown") {
+    const token = process.env.WHATSAPP_ACCESS_TOKEN ?? "";
+    const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID ?? "";
+    if (token && phoneId) {
+      try {
+        const res = await fetch(`https://graph.facebook.com/v25.0/${phoneId}/messages`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to: intake.from,
+            type: "text",
+            body: result.reply,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        console.log("[qaf-send]", JSON.stringify({ ok: res.ok, status: res.status, id: data?.messages?.[0]?.id ?? null, error: data?.error?.message ?? null }));
+      } catch (err) {
+        // Never break the 200 ack: log and keep going.
+        console.log("[qaf-send]", JSON.stringify({ ok: false, error: String(err) }));
+      }
+    } else {
+      console.log("[qaf-send]", JSON.stringify({ ok: false, error: "missing-access-token-or-phone-id" }));
+    }
+  }
   return NextResponse.json({ ok: true, invoked: intake.invoked, skill: result.skill, replyPreview: result.reply });
 }
