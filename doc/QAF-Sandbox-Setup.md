@@ -6,8 +6,9 @@ Status: TUNNEL LIVE · webhook handshake VERIFIED 4 Oct 2026 · Meta-side steps 
 
 ## Live wiring (4 Oct 2026)
 
-- Tunnel: `https://governor-surf-classified-bid.trycloudflare.com` → `http://localhost:3000` (quick tunnel; URL changes on restart — update Meta callback if it does. Rotated twice 4 Oct 2026: first hostname reclaimed by Cloudflare, second rotation after delivery stalls + a stuck dev hot-reload; clean dev restart fixed a local 500).
-- Webhook: `https://governor-surf-classified-bid.trycloudflare.com/api/webhooks/whatsapp` — verify handshake tested OK (challenge echoed, HTTP 200).
+- Tunnel: `https://government-writing-relay-miniature.trycloudflare.com` → `http://localhost:3000` (quick tunnel; URL changes on restart — update Meta callback if it does. Rotated 4 Oct 2026 after machine restart killed server + tunnel; previous rotations same day).
+- Webhook: `https://government-writing-relay-miniature.trycloudflare.com/api/webhooks/whatsapp` — verify handshake tested OK (challenge echoed, HTTP 200).
+- Web chat (no Meta needed): `https://government-writing-relay-miniature.trycloudflare.com/` — participant chat UI backed by the same engine (`/api/chat`).
 - Verify token: stored in local `.env` as `WHATSAPP_VERIFY_TOKEN` (paste the same value into Meta).
 - Admin line: `2348078239107` in local `.env` `ADMIN_NUMBERS` — announcements from this number auto-create deadline proposals; only it (or /admin) can CONFIRM them.
 - Still needed from you: `WHATSAPP_ACCESS_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` in `.env` (Meta dashboard), then restart dev + tunnel if either changed.

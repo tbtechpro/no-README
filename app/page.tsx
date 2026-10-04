@@ -1,20 +1,126 @@
-export default function Home() {
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+
+type Msg = { who: "you" | "qaf"; text: string; handoff?: boolean };
+
+const CHIPS = [
+  "When is the weekly assessment due?",
+  "What should I do next?",
+  "My submission still shows Draft",
+];
+
+export default function Chat() {
+  const [msgs, setMsgs] = useState<Msg[]>([
+    {
+      who: "qaf",
+      text: "Hello! I'm QAF, the Qubators AI assistant. Ask me about deadlines, submissions, lessons, or your next step — I answer only from confirmed cohort info, and I never guess.",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const bottom = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: "smooth" });
+  }, [msgs, busy]);
+
+  async function send(text: string) {
+    const clean = text.trim();
+    if (!clean || busy) return;
+    setInput("");
+    setMsgs((m) => [...m, { who: "you", text: clean }]);
+    setBusy(true);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: clean }),
+      });
+      const data = await res.json();
+      setMsgs((m) => [
+        ...m,
+        {
+          who: "qaf",
+          text: data.reply ?? "Hmm, I stayed quiet on that one — try rephrasing, or start with what you need (deadline, submission, lesson, idea).",
+          handoff: data.handoff === true,
+        },
+      ]);
+    } catch {
+      setMsgs((m) => [...m, { who: "qaf", text: "I couldn't reach the engine just now — check your connection and try again." }]);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
-    <main style={{ maxWidth: 720, margin: "48px auto", padding: "0 24px", lineHeight: 1.6 }}>
-      <h1>QAF Support AI — local scaffold</h1>
-      <p>
-        App and database run <strong>locally for now</strong>: Next.js dev server +
-        SQLite file (<code>prisma/dev.db</code>). No cloud, no auth yet.
-      </p>
-      <ul>
-        <li>
-          Health check: <a href="/api/health">/api/health</a>
-        </li>
-        <li>
-          Next: WhatsApp webhook + corpus retrieval (Plan Phase 1). Admin login
-          arrives with the Admin Console MVP — not needed now.
-        </li>
-      </ul>
+    <main style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f4f6f5" }}>
+      <header style={{ background: "#0E6B6B", color: "#fff", padding: "14px 16px", position: "sticky", top: 0 }}>
+        <div style={{ fontWeight: 800 }}>QAF Support AI</div>
+        <div style={{ fontSize: 12, opacity: 0.85 }}>Qubators AI Foundry · pilot · answers from confirmed info only</div>
+      </header>
+
+      <div style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 10, overflowY: "auto" }}>
+        {msgs.map((m, i) => (
+          <div key={i} style={{ alignSelf: m.who === "you" ? "flex-end" : "flex-start", maxWidth: "85%" }}>
+            <div
+              style={{
+                background: m.who === "you" ? "#0E6B6B" : "#fff",
+                color: m.who === "you" ? "#fff" : "#111",
+                borderRadius: 14,
+                padding: "10px 14px",
+                boxShadow: "0 1px 2px rgba(0,0,0,.08)",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {m.who === "qaf" && <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 4 }}>QAF (AI)</div>}
+              {m.text}
+            </div>
+            {m.handoff && <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>✓ Flagged for a human admin</div>}
+          </div>
+        ))}
+        {busy && <div style={{ color: "#666", fontSize: 13 }}>QAF is typing…</div>}
+        <div ref={bottom} />
+      </div>
+
+      <div style={{ padding: "8px 12px 0", display: "flex", gap: 8, flexWrap: "wrap", background: "#f4f6f5" }}>
+        {CHIPS.map((c) => (
+          <button
+            key={c}
+            onClick={() => send(c)}
+            disabled={busy}
+            style={{ border: "1px solid #0E6B6B", color: "#0E6B6B", background: "#fff", borderRadius: 20, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          send(input);
+        }}
+        style={{ display: "flex", gap: 8, padding: 12, background: "#fff", borderTop: "1px solid #ddd", position: "sticky", bottom: 0 }}
+      >
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask QAF anything…"
+          style={{ flex: 1, border: "1px solid #ccc", borderRadius: 20, padding: "10px 14px", fontSize: 14 }}
+        />
+        <button
+          type="submit"
+          disabled={busy}
+          style={{ background: "#0E6B6B", color: "#fff", border: "none", borderRadius: 20, padding: "10px 18px", fontWeight: 700, cursor: "pointer" }}
+        >
+          Send
+        </button>
+      </form>
+
+      <footer style={{ fontSize: 11, color: "#777", textAlign: "center", padding: "8px 16px 14px", background: "#fff" }}>
+        QAF is an AI assistant, not a human. For personal or sensitive matters, contact the programme admin privately. · <a href="/admin">Admin</a>
+      </footer>
     </main>
   );
 }
