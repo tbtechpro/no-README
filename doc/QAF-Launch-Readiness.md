@@ -16,7 +16,8 @@ controlled pilot (small participant group, Phase 1 scope).
 | Noise guards | ✅ | Invocation gate, 5/min rate limit, complaint tracking |
 | Admin controls | ✅ | /admin: corpus approve/retire, pause, spotlight validation, patterns, metrics |
 | Decisions (PRD Sec 19) | ⚠️ 7.5/8 | Owners, window, conduct, corrections confirmed; session times + links + owner contact routes pending |
-| Sandbox live verification | ⏳ needs you | `doc/QAF-Sandbox-Setup.md` checklist (Meta test number + tunnel) |
+| Sandbox live verification | ✅ tunnel + handshake live 4 Oct 2026 | Tunnel URL + verify handshake tested; Meta callback subscription + access token = your step |
+| Admin line | ✅ 2348078239107 wired | `.env` ADMIN_NUMBERS; announcements auto-propose, CONFIRM applies |
 
 ## Launch sequence
 

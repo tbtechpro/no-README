@@ -2,7 +2,15 @@
 
 Goal: prove the bot receives text + images, detects QAF invocation, and stays
 silent otherwise — WITHOUT touching the real participant group.
-Status: GUIDE READY · live verification PENDING (needs your Meta account + dev phones).
+Status: TUNNEL LIVE · webhook handshake VERIFIED 4 Oct 2026 · Meta-side steps pending (your Meta account + test phones).
+
+## Live wiring (4 Oct 2026)
+
+- Tunnel: `https://danny-aids-weighted-assigned.trycloudflare.com` → `http://localhost:3000` (quick tunnel; URL changes on restart — update Meta callback if it does).
+- Webhook: `https://danny-aids-weighted-assigned.trycloudflare.com/api/webhooks/whatsapp` — verify handshake tested OK (challenge echoed, HTTP 200).
+- Verify token: stored in local `.env` as `WHATSAPP_VERIFY_TOKEN` (paste the same value into Meta).
+- Admin line: `2348078239107` in local `.env` `ADMIN_NUMBERS` — announcements from this number auto-create deadline proposals; only it (or /admin) can CONFIRM them.
+- Still needed from you: `WHATSAPP_ACCESS_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` in `.env` (Meta dashboard), then restart dev + tunnel if either changed.
 
 ## A. Meta Cloud API test number (free)
 
