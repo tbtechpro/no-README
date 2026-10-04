@@ -76,7 +76,7 @@ export async function POST(req: Request) {
             messaging_product: "whatsapp",
             to: intake.from,
             type: "text",
-            body: result.reply,
+            text: { body: result.reply },
           }),
         });
         const data = await res.json().catch(() => ({}));
