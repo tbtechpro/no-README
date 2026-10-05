@@ -18,12 +18,19 @@ actions remain — everything below needs YOUR logins; nothing else needs coding
 2. **Add New → Project → Import** `tbtechpro/no-README` (root folder
    `AI Practical` if prompted — the repo root IS the app; `vercel.json`
    in the repo already sets the build command, nothing to type).
-3. **Environment Variables** — add exactly these (names must match):
-   - `DATABASE_URL` = the Neon pooled string from step 1.
+3. **Environment Variables** — add exactly these (names must match).
+   Leave all environment checkboxes ticked (Production is the one that
+   matters; Preview/Development ticked is harmless):
+   - `DATABASE_URL` = the Neon **pooled** string from step 1 (hostname
+     contains `-pooler`).
+   - `DIRECT_URL` = the Neon **direct** string — same Connect modal with
+     pooling toggled OFF and copied (hostname has NO `-pooler`).
    - `ADMIN_NUMBERS` = `2348078239107`
    - (Optional, only if keeping WhatsApp too: `WHATSAPP_VERIFY_TOKEN`,
      `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` — same values
      as local `.env`.)
+   **Ignore** any "Add storage / Prisma Postgres" prompts — Neon is our
+   database; that button would spin up a second, unused one.
 4. Click **Deploy**. First build runs `prisma db push` (creates all tables
    on Neon) then `next build`.
 
