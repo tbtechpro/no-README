@@ -9,6 +9,8 @@ import { isPaused, setPaused, listTickets, validateTicket } from "@/lib/qaf/stor
 // Admin console (local only, no login yet — auth arrives with real deployment).
 // Reads/writes go through Prisma (SQLite locally, Postgres hosted).
 // Corpus browser + pause switch + ticket queue + patterns + deadline/reminders.
+// Always freshly rendered: admin data changes with every chat message.
+export const dynamic = "force-dynamic";
 
 // Next Sunday 23:59 WAT (UTC+1) from now.
 function nextSundayDeadline(from = new Date()): Date {

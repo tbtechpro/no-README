@@ -16,5 +16,5 @@ export async function POST(req: Request) {
   if (!message.trim()) return NextResponse.json({ error: "empty message" }, { status: 400 });
   const sender = "web:" + String(body.sender ?? "anon").slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "");
   const result = await answer(message, { msgId: `web-${Date.now()}`, sender, isReplyToQaf: true });
-  return NextResponse.json({ reply: result.reply, skill: result.skill, handoff: result.handoff });
+  return NextResponse.json({ reply: result.reply, skill: result.skill, handoff: result.handoff, linkCards: result.linkCards ?? [] });
 }

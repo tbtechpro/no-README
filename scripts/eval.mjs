@@ -5,25 +5,18 @@ import { prisma } from "../lib/qaf/db.js";
 // Eval: node scripts/eval.mjs [--only=e01,e02]
 // Checks reply contents case-insensitively; silence cases must return null.
 // Runs against the database (SQLite locally): governance + log tables are
-// reset around the run so e88+ stay deterministic without touching live rows
-// beyond the run (tables are shared with dev — eval traffic is synthetic).
-
-// Snapshot live governance rows, then reset for determinism.
-const saved = {};
+// Reset for determinism (also wipes residue from any interrupted run).
 try {
-  saved.overlay = await prisma.deadlineOverlay.findUnique({ where: { id: "active" } });
-  saved.proposal = await prisma.deadlineProposal.findUnique({ where: { id: "single" } });
-  saved.pause = await prisma.pauseState.findUnique({ where: { id: "global" } });
-} catch (err) {
+  await prisma.decisionLog.deleteMany();
+  await prisma.ticket.deleteMany();
+  await prisma.deadlineProposal.deleteMany();
+  await prisma.deadlineOverlay.deleteMany();
+  await prisma.corpusStatusOverride.deleteMany();
+  await prisma.pauseState.deleteMany();
+} catch {
   console.error("EVAL: database unreachable — run `npm.cmd run db:push` first.");
   process.exit(2);
 }
-await prisma.decisionLog.deleteMany();
-await prisma.ticket.deleteMany();
-await prisma.deadlineProposal.deleteMany();
-await prisma.deadlineOverlay.deleteMany();
-await prisma.corpusStatusOverride.deleteMany();
-await prisma.pauseState.deleteMany();
 
 const onlyArg = process.argv.find((a) => a.startsWith("--only="));
 const only = onlyArg ? new Set(onlyArg.split("=")[1].split(",")) : null;
@@ -52,6 +45,11 @@ for (const c of cases) {
   } else {
     for (const m of c.mustInclude || []) if (!low(r.reply).includes(low(m))) problems.push(`missing "${m}"`);
     for (const m of c.mustNotInclude || []) if (low(r.reply).includes(low(m))) problems.push(`banned "${m}" present`);
+    const cards = r.linkCards ?? [];
+    for (const u of c.expectCards || []) {
+      if (!cards.some((card) => low(card.url).includes(low(u)))) problems.push(`missing card "${u}"`);
+    }
+    if (c.expectNoCards === true && cards.length > 0) problems.push(`unexpected ${cards.length} link card(s)`);
   }
   if (problems.length === 0) pass++;
   else fails.push({ id: c.id, expected: c.expected, skill: r.skill, problems, reply: (r.reply || "").slice(0, 220) });
@@ -64,15 +62,12 @@ for (const f of fails) {
   for (const p of f.problems) console.log(`  - ${p}`);
   if (f.reply) console.log(`  > ${f.reply}`);
 }
-// Restore live governance rows; drop synthetic eval traffic.
+// Drop synthetic eval traffic; leave tables clean (no restore — see header).
 await prisma.decisionLog.deleteMany();
 await prisma.ticket.deleteMany();
 await prisma.deadlineProposal.deleteMany();
 await prisma.deadlineOverlay.deleteMany();
 await prisma.corpusStatusOverride.deleteMany();
 await prisma.pauseState.deleteMany();
-if (saved.overlay) await prisma.deadlineOverlay.create({ data: { id: "active", label: saved.overlay.label, source: saved.overlay.source, by: saved.overlay.by } });
-if (saved.proposal) await prisma.deadlineProposal.create({ data: { id: "single", label: saved.proposal.label, by: saved.proposal.by } });
-if (saved.pause) await prisma.pauseState.create({ data: { id: "global", paused: saved.pause.paused } });
 await prisma.$disconnect();
 process.exit(fails.length ? 1 : 0);
