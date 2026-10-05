@@ -45,14 +45,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// TODO(go-live): switch to postgresql + directUrl the moment Neon strings
-// exist (prepared in chat 4 Oct 2026). template:
-//   provider  = "postgresql"
-//   url       = env("DATABASE_URL")
-//   directUrl = env("DIRECT_URL")
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled (-pooler) URL at runtime
+  directUrl = env("DIRECT_URL") // direct (non-pooler) URL for `prisma db push`
 }
 
 model CorpusItem {
