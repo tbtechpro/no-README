@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 
-type Msg = { who: "you" | "qaf"; text: string; handoff?: boolean };
+type LinkCard = { id: string; label: string; url: string; badge: string };
+type Msg = { who: "you" | "qaf"; text: string; handoff?: boolean; linkCards?: LinkCard[] };
 
 const CHIPS = [
   "When is the weekly assessment due?",
@@ -44,6 +45,7 @@ export default function Chat() {
           who: "qaf",
           text: data.reply ?? "Hmm, I stayed quiet on that one — try rephrasing, or start with what you need (deadline, submission, lesson, idea).",
           handoff: data.handoff === true,
+          linkCards: Array.isArray(data.linkCards) ? data.linkCards : [],
         },
       ]);
     } catch {
@@ -76,6 +78,19 @@ export default function Chat() {
               {m.who === "qaf" && <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 4 }}>QAF (AI)</div>}
               {m.text}
             </div>
+            {m.who === "qaf" && (m.linkCards ?? []).map((c) => (
+              <a
+                key={c.id}
+                href={c.url}
+                target="_blank"
+                rel="noreferrer"
+                style={{ display: "block", marginTop: 6, background: "#fff", border: "1px solid #E7E2D8", borderLeft: "4px solid #F59E0B", borderRadius: 10, padding: "8px 10px", textDecoration: "none" }}
+              >
+                <span style={{ display: "inline-block", fontSize: 10, fontWeight: 800, background: "#F1EDFF", color: "#4C1D95", borderRadius: 12, padding: "1px 8px", marginBottom: 4 }}>{c.badge}</span>
+                <span style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1E1B4B" }}>{c.label}</span>
+                <span style={{ display: "block", fontSize: 11, color: "#6B6A85" }}>{c.url.replace(/^https?:\/\//, "").split("/")[0]}</span>
+              </a>
+            ))}
             {m.handoff && <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>✓ Flagged for a human admin</div>}
           </div>
         ))}
