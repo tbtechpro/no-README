@@ -13,6 +13,7 @@ model DeadlineProposal {
   id    String   @id @default("single") // one pending proposal at a time
   label String
   by    String
+  dueAt String? // ISO date the proposed label describes (for triggers)
   at    DateTime @default(now())
 }
 
@@ -21,6 +22,7 @@ model DeadlineOverlay {
   label  String
   source String   @default("admin-announcement")
   by     String
+  dueAt  String? // ISO date the label describes (for triggers)
   at     DateTime @default(now())
 }
 
@@ -38,6 +40,38 @@ model SendLog {
   status    Int?
   metaId    String?
   error     String?
+  createdAt DateTime @default(now())
+}
+
+model ReminderSubscription {
+  id        String   @id @default(cuid())
+  userKey   String // anonymous client key (localStorage uuid)
+  trigger   String // assessment-48h | assessment-6h | new-event | starting-1h | deadline-changed
+  createdAt DateTime @default(now())
+
+  @@unique([userKey, trigger])
+}
+
+model ReminderInbox {
+  id        String   @id @default(cuid())
+  userKey   String
+  trigger   String
+  ref       String // dedupe key: cycle label, event id, or overlay timestamp
+  title     String
+  body      String
+  url       String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([userKey, trigger, ref])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userKey   String   @unique
+  endpoint  String
+  p256dh    String
+  auth      String
   createdAt DateTime @default(now())
 }
 

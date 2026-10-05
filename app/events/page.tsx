@@ -20,6 +20,7 @@ export default async function Events() {
         <div style={{ fontSize: 12, opacity: 0.85 }}>
           <a href="/" style={{ color: "#fff", marginRight: 12 }}>Ask</a>
           <a href="/events" style={{ color: "#F59E0B", marginRight: 12 }}>Events</a>
+          <a href="/reminders" style={{ color: "#fff", marginRight: 12 }}>Reminders</a>
           <a href="/learn" style={{ color: "#fff", marginRight: 12 }}>Learn</a>
           <a href="/admin" style={{ color: "#fff" }}>Admin</a>
         </div>
