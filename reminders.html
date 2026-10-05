@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QAF Reminders — Outcome Preview</title>
+<style>
+  :root{--indigo:#1E1B4B;--amber:#F59E0B;--paper:#FAF7F2;--ink:#232136;--muted:#6B6A85;--line:#E7E2D8;--green:#1F7A3D;--red:#B3261E}
+  *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--paper);color:var(--ink)}
+  header{background:var(--indigo);color:#fff;padding:32px 24px;text-align:center}
+  header h1{margin:0 0 6px} header h1 span{color:var(--amber)} header p{opacity:.85;margin:0}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 16px 60px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 2px 8px rgba(30,27,75,.06)}
+  .card h3{margin:0 0 4px;color:var(--indigo)} .card p{margin:4px 0;font-size:13px;color:var(--muted)}
+  .row{display:flex;align-items:center;gap:10px}
+  .row .grow{flex:1}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px}
+  .p-up{background:#FEF3C7;color:#92400E}.p-live{background:#D9F2E3;color:#14532D}.p-done{background:#E5E7EB;color:#4B5563}
+  .toggle{width:46px;height:26px;border-radius:20px;border:none;cursor:pointer;background:#D1D5DB;position:relative;flex-shrink:0}
+  .toggle.on{background:var(--green)} .toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+  .toggle.on::after{left:23px}
+  .cd{background:var(--indigo);color:#fff;border-radius:14px;padding:16px;text-align:center;margin:14px 0}
+  .cd .t{font-size:30px;font-weight:800;color:var(--amber)} .cd small{opacity:.8}
+  .push{background:#1F2937;color:#fff;border-radius:12px;padding:12px 14px;margin:10px 0;font-size:13px;display:none}
+  .push.show{display:block;animation:slide .3s} @keyframes slide{from{transform:translateY(8px);opacity:0}}
+  .push b{color:var(--amber)}
+  .inbox{font-size:13px} .inbox li{margin:6px 0;list-style:none;background:#F6F4EE;border-radius:8px;padding:8px 10px}
+  .inbox ul{padding:0;margin:8px 0 0}
+  button.cta{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:800;cursor:pointer}
+  .trig{font-size:12px;color:var(--muted)} .trig b{color:var(--indigo)}
+  footer{font-size:12px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header><h1>QAF Reminders <span>· Outcome Preview</span></h1><p>Web-native triggers so nobody forgets. Mock — buttons actually toggle here.</p></header>
+<div class="wrap">
+
+<div class="cd"><small>Weekly assessment closes in</small><div class="t" id="cd">2d 04:13:22</div><small>Sundays 11:59pm WAT · auto-tracks admin-confirmed changes</small></div>
+
+<div class="card">
+  <h3>🔔 Never-miss triggers <span class="pill p-live">4 active</span></h3>
+  <p>Each trigger watches official info and nudges subscribers. Tap to subscribe:</p>
+  <div class="row" style="margin:8px 0"><div class="grow"><b>Assessment due — 48h + 6h warnings</b><br><span class="trig">Fires from the <b>confirmed deadline</b>, survives admin date changes</span></div><button class="toggle on" onclick="flip(this,'Deadline warnings')"></button></div>
+  <div class="row" style="margin:8px 0"><div class="grow"><b>New event published</b><br><span class="trig">Any session added to Events → instant nudge + link card</span></div><button class="toggle on" onclick="flip(this,'New events')"></button></div>
+  <div class="row" style="margin:8px 0"><div class="grow"><b>Event starting — 1h before</b><br><span class="trig">Info sessions, orientations, Knowledge Sharing Fridays</span></div><button class="toggle on" onclick="flip(this,'Starting soon')"></button></div>
+  <div class="row" style="margin:8px 0"><div class="grow"><b>Replay available</b><br><span class="trig">Missed it live? Get the YouTube replay link</span></div><button class="toggle" onclick="flip(this,'Replays')"></button></div>
+  <div class="row" style="margin:8px 0"><div class="grow"><b>Deadline changed by admin</b><br><span class="trig">Old → new notice the moment CONFIRM lands</span></div><button class="toggle on" onclick="flip(this,'Deadline changes')"></button></div>
+</div>
+
+<div class="push" id="push">🔔 <b>QAF · </b><span id="pushText"></span></div>
+
+<div class="card inbox">
+  <h3>📥 Reminder inbox <span class="pill p-up" id="nCount">2 unread</span></h3>
+  <ul id="inbox">
+    <li>⏰ Assessment due in 48h — submit before <b>Sunday 11:59pm WAT</b> <u>Submit link</u></li>
+    <li>📅 New event: <b>AI Foundry Info Session</b> — Instagram live, 1:00 PM <u>Register</u></li>
+  </ul>
+  <button class="cta" onclick="demo()">▶ Simulate a trigger firing</button>
+</div>
+
+<div class="card">
+  <h3>⚙️ How delivery works (web, free)</h3>
+  <p><b>1 · Browser push</b> — one permission prompt, works even with the site closed. Free, no third party (VAPID + service worker).<br>
+  <b>2 · Inbox</b> — every nudge also lands here, so nothing is lost if push is denied.<br>
+  <b>3 · Countdowns</b> — deadline + next-event timers computed from confirmed data, auto-update on admin changes.<br>
+  Subscriptions + inbox live in Neon; a tiny scheduler checks what's due.</p>
+</div>
+
+<footer>WhatsApp needed? Only for <b>group-native</b> reminders — see note below the demo. This page needs nothing but a browser.</footer>
+</div>
+<script>
+  let n = 2;
+  function flip(btn, name){
+    btn.classList.toggle('on');
+    const on = btn.classList.contains('on');
+    push((on ? 'Subscribed: ' : 'Muted: ') + name);
+  }
+  function push(text){
+    document.getElementById('pushText').textContent = text;
+    const p = document.getElementById('push');
+    p.classList.remove('show'); void p.offsetWidth; p.classList.add('show');
+  }
+  const demos = [
+    'Reminder: Assessment due in 6h — submit before Sunday 11:59pm WAT.',
+    'Update: deadline changed — was Sunday, now Monday 6pm. Follow the new date.',
+    'Starting in 1h: Knowledge Sharing — Idea to MVP. Watch on LinkedIn.',
+    'Replay ready: Cohort 2 Orientation. Watch on YouTube.'
+  ];
+  let di = 0;
+  function demo(){
+    const t = demos[di++ % demos.length];
+    push(t);
+    const li = document.createElement('li'); li.textContent = t;
+    document.getElementById('inbox').prepend(li);
+    n++; document.getElementById('nCount').textContent = n + ' unread';
+  }
+  function tick(){
+    const now = new Date();
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() + ((7 - d.getUTCDay()) % 7 || 7));
+    d.setUTCHours(22,59,0,0);
+    let s = Math.max(0, Math.floor((d - now) / 1000));
+    const dd = Math.floor(s/86400); s%=86400;
+    const hh = String(Math.floor(s/3600)).padStart(2,'0');
+    const mm = String(Math.floor(s%3600/60)).padStart(2,'0');
+    const ss = String(s%60).padStart(2,'0');
+    document.getElementById('cd').textContent = dd + 'd ' + hh + ':' + mm + ':' + ss;
+  }
+  setInterval(tick, 1000); tick();
+</script>
+</body>
+</html>
