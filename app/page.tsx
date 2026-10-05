@@ -59,7 +59,12 @@ export default function Chat() {
     <main style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f4f6f5" }}>
       <header style={{ background: "#0E6B6B", color: "#fff", padding: "14px 16px", position: "sticky", top: 0 }}>
         <div style={{ fontWeight: 800 }}>QAF Support AI</div>
-        <div style={{ fontSize: 12, opacity: 0.85 }}>Qubators AI Foundry · pilot · answers from confirmed info only</div>
+        <div style={{ fontSize: 12, opacity: 0.85 }}>
+          <a href="/" style={{ color: "#fff", marginRight: 12 }}>Ask</a>
+          <a href="/events" style={{ color: "#fff", marginRight: 12 }}>Events</a>
+          <a href="/learn" style={{ color: "#fff", marginRight: 12 }}>Learn</a>
+          <a href="/admin" style={{ color: "#fff" }}>Admin</a>
+        </div>
       </header>
 
       <div style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 10, overflowY: "auto" }}>
