@@ -11,6 +11,15 @@ actions remain — everything below needs YOUR logins; nothing else needs coding
    connection → Copy. It looks like:
    `postgresql://user:password@ep-xxx.pooler.neon.tech/dbname?sslmode=require`
 4. Keep it — you paste it into Vercel next.
+5. If this is a brand-new project, it ships with a sample `playing_with_neon`
+   table — harmless. Our first deploy replaces it with QAF tables automatically.
+
+## 1b. Wake the database (1 min, prevents failed builds)
+
+Neon's free tier sleeps after 5 idle minutes. A build touching a sleeping
+database can time out — so **before every deploy**: Neon console → **SQL
+Editor** → run `SELECT 1;` → confirm compute Status shows **Active** →
+deploy within a few minutes.
 
 ## 2. Vercel hosting (5 min)
 
@@ -26,13 +35,19 @@ actions remain — everything below needs YOUR logins; nothing else needs coding
    - `DIRECT_URL` = the Neon **direct** string — same Connect modal with
      pooling toggled OFF and copied (hostname has NO `-pooler`).
    - `ADMIN_NUMBERS` = `2348078239107`
+   - Paste hygiene (causes every P1013 build failure so far): paste the
+     **bare string** — no `"` quotes around it, no leading/trailing spaces,
+     must start with `postgresql://`. When fixing, **delete the variable
+     and re-add it** rather than editing in place.
    - (Optional, only if keeping WhatsApp too: `WHATSAPP_VERIFY_TOKEN`,
      `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` — same values
      as local `.env`.)
    **Ignore** any "Add storage / Prisma Postgres" prompts — Neon is our
    database; that button would spin up a second, unused one.
-4. Click **Deploy**. First build runs `prisma db push` (creates all tables
-   on Neon) then `next build`.
+4. Click **Deploy**. First build runs env check → `prisma db push`
+   (creates all tables on Neon) then `next build`. **Env changes never
+   apply retroactively** — after any variable edit you must **Redeploy**
+   (Deployments → ⋯ → Redeploy) for it to take effect.
 
 ## 3. Verify (2 min, tell me the URL and I'll do it with you)
 
