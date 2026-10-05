@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QAF Web Architecture — Blueprint</title>
+<style>
+  :root{--indigo:#1E1B4B;--amber:#F59E0B;--paper:#FAF7F2;--ink:#232136;--muted:#6B6A85;--card:#fff;--line:#E7E2D8;--teal:#0E6B6B;--green:#1F7A3D}
+  *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55}
+  header{background:var(--indigo);color:#fff;padding:40px 24px;text-align:center}
+  header h1{margin:0 0 8px;font-size:28px} header h1 span{color:var(--amber)}
+  header p{margin:0;opacity:.85;max-width:640px;margin:0 auto}
+  .wrap{max-width:1020px;margin:0 auto;padding:28px 20px 60px}
+  h2{color:var(--indigo);border-bottom:3px solid var(--amber);padding-bottom:6px;margin-top:44px}
+  .grid{display:grid;gap:14px} .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(30,27,75,.06)}
+  .card h3{margin:0 0 6px;font-size:15px;color:var(--indigo)} .card p{margin:0;font-size:13px;color:var(--muted)}
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:18px 0}
+  .node{flex:1;min-width:150px;background:var(--card);border:2px solid var(--indigo);border-radius:12px;padding:12px;text-align:center;font-size:13px;font-weight:600}
+  .node small{display:block;font-weight:400;color:var(--muted);margin-top:4px}
+  .node.src{border-color:var(--amber)} .node.live{border-color:var(--green);background:#F2FAF4}
+  .arrow{align-self:center;padding:0 8px;color:var(--amber);font-size:22px;font-weight:800}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;margin:2px}
+  .p-live{background:#D9F2E3;color:#14532D}.p-up{background:#FEF3C7;color:#92400E}.p-re{background:#E0E7FF;color:#3730A3}.p-link{background:#F1EDFF;color:#4C1D95}
+  .mock{border:2px solid var(--indigo);border-radius:18px;overflow:hidden;background:#fff}
+  .mock .bar{background:var(--indigo);color:#fff;padding:10px 14px;font-weight:800;font-size:14px}
+  .mock .bar small{display:block;font-weight:400;font-size:11px;opacity:.8}
+  .mock .body{padding:14px;min-height:120px}
+  .askbar{display:flex;gap:8px;background:#fff;border:2px solid var(--amber);border-radius:24px;padding:8px 8px 8px 16px;font-size:13px;color:var(--muted)}
+  .askbar b{margin-left:auto;background:var(--amber);color:#fff;border-radius:16px;padding:4px 14px}
+  .linkcard{display:flex;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:8px;font-size:12px}
+  .linkcard .t{font-weight:700;color:var(--indigo)} .linkcard .u{color:var(--muted)}
+  .ev{border-left:4px solid var(--amber);padding:8px 10px;margin:8px 0;background:#FFFBEB;border-radius:0 10px 10px 0;font-size:12px}
+  .sw{display:inline-block;width:44px;height:26px;border-radius:6px;vertical-align:middle;margin-right:8px;border:1px solid #0002}
+  table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:12px;overflow:hidden}
+  th{background:var(--indigo);color:#fff;text-align:left;padding:8px 10px} td{padding:8px 10px;border-bottom:1px solid var(--line)}
+  code{background:#EFEDE6;border-radius:4px;padding:1px 5px;font-size:12px}
+  .note{background:#FFF7E6;border:1px solid var(--amber);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>QAF Web Architecture <span>· Blueprint v1</span></h1>
+  <p>Ask-first Qubators companion — proposed rebuild. Every page one tap from asking; every answer carries official-link cards. Status: proposed, not yet built.</p>
+</header>
+<div class="wrap">
+
+<h2>1 · System at a glance</h2>
+<div class="flow">
+  <div class="node src">Official sources<small>qubators.org · learn portal · LinkedIn · YouTube · Instagram</small></div><div class="arrow">→</div>
+  <div class="node src">Link + Event registry<small>curated URLs, dated events, CorpusItem types</small></div><div class="arrow">→</div>
+  <div class="node">QAF engine<small>same pipeline · 92-case net · + link cards</small></div><div class="arrow">→</div>
+  <div class="node live">5 surfaces<small>Home · Ask · Events · Learn · Admin</small></div>
+</div>
+<div class="note">Unchanged from today: deadline governance (propose → CONFIRM), uncertainty referral, safety refusals, Neon + Vercel hosting. New: link cards, events model, fresh identity.</div>
+
+<h2>2 · The five surfaces (mock previews)</h2>
+<div class="grid g3">
+  <div><div class="mock"><div class="bar">QAF · Qubators companion<small>Ask about programs, events, lessons…</small></div><div class="body">
+    <div class="askbar">When is Demo Day?… <b>Ask</b></div>
+    <p style="font-size:12px">🚀 Start Building &nbsp; 📅 Events &nbsp; 📚 Learn</p>
+    <div class="ev"><span class="pill p-live">● LIVE NOW</span><br><b>Knowledge Sharing: Idea to MVP</b><br>LinkedIn · Fridays 3pm GMT+1 · <u>Watch</u></div>
+    <div class="ev"><span class="pill p-up">NEXT UP</span><br><b>Cohort 2 Orientation replay</b><br>YouTube @QubatorsNetwork · <u>Replay</u></div>
+  </div></div><p style="font-size:13px"><b>1 · Home.</b> Ask bar first, three doors, live/next strip.</p></div>
+  <div><div class="mock"><div class="bar">Ask QAF<small>answers cite official sources</small></div><div class="body">
+    <div class="linkcard" style="background:#F1EDFF;border:none"><div><div class="t">You</div>How do I join AI Foundry?</div></div>
+    <div class="linkcard"><div><div class="t">Free, practical training — prompt engineering → product.</div><div class="u">Apply at qubators.org/aifoundry</div><span class="pill p-link">Program</span> <span class="pill p-link">Apply</span></div></div>
+  </div></div><p style="font-size:13px"><b>2 · Ask.</b> Assistant answers + tappable official-link cards. Unconfirmed → referral, never invented dates.</p></div>
+  <div><div class="mock"><div class="bar">Events<small>never miss a session</small></div><div class="body">
+    <div class="ev"><span class="pill p-up">UPCOMING · Apr 29</span><br><b>AI Foundry Info Session</b><br>Instagram live · 1:00 PM · <u>Register</u></div>
+    <div class="ev"><span class="pill p-re">REPLAY</span><br><b>Orientation — Cohort 2</b><br>YouTube · <u>Watch</u></div>
+    <div class="ev"><span class="pill p-re">REPLAY</span><br><b>Idea to MVP w/ Pascal Oseaga</b><br>LinkedIn · <u>Watch</u></div>
+  </div></div><p style="font-size:13px"><b>3 · Events.</b> Status logic: Upcoming → Live now → Replay. Data-driven, no missed announcements.</p></div>
+</div>
+<div class="grid g3" style="margin-top:14px">
+  <div><div class="mock"><div class="bar">Learn &amp; Build<small>lesson → build → submit → Demo Day</small></div><div class="body">
+    <div class="ev"><b>1 · Prompt engineering</b><br>learn.qubators.org · <u>Start lesson</u></div>
+    <div class="ev"><b>2 · AI workflows + automation</b><br>learn.qubators.org · <u>Continue</u></div>
+    <div class="ev"><b>3 · Ship prototype → submit</b><br>Due Sundays 11:59pm WAT · <u>Submit</u></div>
+  </div></div><p style="font-size:13px"><b>4 · Learn &amp; Build.</b> Path view tying lessons to the Foundry curriculum and the weekly deadline.</p></div>
+  <div><div class="mock"><div class="bar" style="background:#0E6B6B">Admin<small>existing powers + Events/Links editor</small></div><div class="body" style="font-size:12px">
+    Corpus 36/40 · Tickets 0 open<br>Pending proposal: <i>none</i><br><b>+ New event</b> · <b>+ New link</b> publish without deploys
+  </div></div><p style="font-size:13px"><b>5 · Admin.</b> Unchanged powers, plus publishing events/links directly.</p></div>
+  <div><div class="mock"><div class="bar">Visual identity<small>new public look</small></div><div class="body" style="font-size:12px">
+    <div><span class="sw" style="background:#1E1B4B"></span>Indigo #1E1B4B — headers</div>
+    <div><span class="sw" style="background:#F59E0B"></span>Amber #F59E0B — actions</div>
+    <div><span class="sw" style="background:#FAF7F2"></span>Paper #FAF7F2 — background</div>
+    <div style="margin-top:6px">Admin keeps serious teal; public app wears indigo + amber.</div>
+  </div></div><p style="font-size:13px"><b>Identity.</b> Builder energy, mobile-first, 16px base.</p></div>
+</div>
+
+<h2>3 · Data model additions</h2>
+<table>
+<tr><th>Model / corpus type</th><th>Key fields</th><th>Serves</th></tr>
+<tr><td><code>official-link</code> (corpus)</td><td>label, url, badge (Program/Event/Lesson/Social/Apply)</td><td>Ask link cards</td></tr>
+<tr><td><code>event</code> (corpus)</td><td>title, date, channel, reg/replay url, status → upcoming/live/replay</td><td>Events feed, Ask event answers</td></tr>
+<tr><td><code>EventItem</code> (Prisma, optional)</td><td>same as above, editable from Admin</td><td>Publish without deploys</td></tr>
+<tr><td>Answer shape</td><td><code>{ reply, linkCards[] }</code> — card mandatory when a program/event/lesson is named</td><td>Ask UI</td></tr>
+</table>
+
+<h2>4 · Official link registry (seed)</h2>
+<div class="grid g3">
+  <div class="card"><h3>Program</h3><p>qubators.org/aifoundry — free training, curriculum, registration <span class="pill p-link">Apply</span></p></div>
+  <div class="card"><h3>Live &amp; stream</h3><p>qubators.org/stream — orientations &amp; live events <span class="pill p-link">Event</span></p></div>
+  <div class="card"><h3>Learn portal</h3><p>learn.qubators.org — lessons &amp; materials <span class="pill p-link">Lesson</span></p></div>
+  <div class="card"><h3>LinkedIn</h3><p>Qubators Network — info &amp; knowledge-sharing sessions <span class="pill p-link">Event</span></p></div>
+  <div class="card"><h3>YouTube</h3><p>@QubatorsNetwork — orientations &amp; replays <span class="pill p-link">Replay</span></p></div>
+  <div class="card"><h3>Instagram</h3><p>@qubatorsnetwork — live sessions &amp; announcements <span class="pill p-link">Social</span></p></div>
+</div>
+
+<div class="note"><b>Next step:</b> implementation plan — phased build (registry + events model → Ask link cards → Events feed → Learn paths → reskin → eval additions → deploy), each phase shipping visibly on the live Vercel + Neon setup. Say the word and I draft it.</div>
+</div>
+</body>
+</html>
