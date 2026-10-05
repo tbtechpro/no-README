@@ -56,9 +56,9 @@ export default function Chat() {
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f4f6f5" }}>
-      <header style={{ background: "#0E6B6B", color: "#fff", padding: "14px 16px", position: "sticky", top: 0 }}>
-        <div style={{ fontWeight: 800 }}>QAF Support AI</div>
+    <main style={{ maxWidth: 480, margin: "0 auto", minHeight: "100vh", display: "flex", flexDirection: "column", background: "#FAF7F2" }}>
+      <header style={{ background: "#1E1B4B", color: "#fff", padding: "14px 16px", position: "sticky", top: 0 }}>
+        <div style={{ fontWeight: 800 }}>QAF <span style={{ color: "#F59E0B" }}>· Qubators companion</span></div>
         <div style={{ fontSize: 12, opacity: 0.85 }}>
           <a href="/" style={{ color: "#fff", marginRight: 12 }}>Ask</a>
           <a href="/events" style={{ color: "#fff", marginRight: 12 }}>Events</a>
@@ -73,15 +73,16 @@ export default function Chat() {
           <div key={i} style={{ alignSelf: m.who === "you" ? "flex-end" : "flex-start", maxWidth: "85%" }}>
             <div
               style={{
-                background: m.who === "you" ? "#0E6B6B" : "#fff",
+                background: m.who === "you" ? "#1E1B4B" : "#fff",
                 color: m.who === "you" ? "#fff" : "#111",
                 borderRadius: 14,
                 padding: "10px 14px",
                 boxShadow: "0 1px 2px rgba(0,0,0,.08)",
                 whiteSpace: "pre-wrap",
+                border: m.who === "you" ? "none" : "1px solid #E7E2D8",
               }}
             >
-              {m.who === "qaf" && <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 4 }}>QAF (AI)</div>}
+              {m.who === "qaf" && <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 4, color: "#1E1B4B" }}>QAF (AI)</div>}
               {m.text}
             </div>
             {m.who === "qaf" && (m.linkCards ?? []).map((c) => (
@@ -104,13 +105,13 @@ export default function Chat() {
         <div ref={bottom} />
       </div>
 
-      <div style={{ padding: "8px 12px 0", display: "flex", gap: 8, flexWrap: "wrap", background: "#f4f6f5" }}>
+      <div style={{ padding: "8px 12px 0", display: "flex", gap: 8, flexWrap: "wrap", background: "#FAF7F2" }}>
         {CHIPS.map((c) => (
           <button
             key={c}
             onClick={() => send(c)}
             disabled={busy}
-            style={{ border: "1px solid #0E6B6B", color: "#0E6B6B", background: "#fff", borderRadius: 20, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}
+            style={{ border: "1px solid #1E1B4B", color: "#1E1B4B", background: "#fff", borderRadius: 20, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}
           >
             {c}
           </button>
@@ -133,7 +134,7 @@ export default function Chat() {
         <button
           type="submit"
           disabled={busy}
-          style={{ background: "#0E6B6B", color: "#fff", border: "none", borderRadius: 20, padding: "10px 18px", fontWeight: 700, cursor: "pointer" }}
+          style={{ background: "#F59E0B", color: "#fff", border: "none", borderRadius: 20, padding: "10px 18px", fontWeight: 700, cursor: "pointer" }}
         >
           Send
         </button>
