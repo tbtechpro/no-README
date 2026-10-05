@@ -16,6 +16,7 @@
     "check": "prisma db push && node scripts/eval.mjs && node scripts/freshness.mjs",
     "vercel-build": "node scripts/check-env.mjs && prisma db push && next build",
     "db:push": "prisma db push",
+    "db:push:force": "prisma db push --accept-data-loss",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio"
   },
